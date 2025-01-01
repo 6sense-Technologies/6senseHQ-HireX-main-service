@@ -61,11 +61,11 @@ async function bootstrap() {
       basePath: '/api',
     },
     customSiteTitle: 'HireX app',
-    url: `http://192.168.0.158:8000/api`,
+    url: configService.get('LAN_URL'),
   });
 
   appLogger.log('intialized swagger use /api to access');
   appLogger.log('App running on port: ' + port);
-  await app.listen(port, '192.168.0.158');
+  await app.listen(port, configService.get('LAN_IP'));
 }
 bootstrap();
