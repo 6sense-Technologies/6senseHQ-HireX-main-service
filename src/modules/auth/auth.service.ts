@@ -16,6 +16,7 @@ import {
 } from './dto/auth.dto';
 import { OAuth2Client } from 'google-auth-library';
 import { appConfig } from 'src/configuration/app.config';
+import axios from 'axios';
 @Injectable()
 export class AuthService {
   constructor(
@@ -148,15 +149,18 @@ export class AuthService {
     if (dto.provider !== 'google') {
       throw new BadRequestException('Unsupported provider');
     }
-
+    console.log(appConfig.GOOGLE_CLIENT_ID)
+    console.log(appConfig.GOOGLE_CLIENT_SECRET)
     const client = new OAuth2Client(
       appConfig.GOOGLE_CLIENT_ID,
       appConfig.GOOGLE_CLIENT_SECRET,
+      'postmessage'
     );
+    
     const response = await client.getToken(dto.authCode);
-
+    
     const idToken = response.tokens.id_token;
-    console.log(idToken);
+ 
     const ticket = await client.verifyIdToken({
       idToken: idToken,
       audience: appConfig.GOOGLE_CLIENT_ID,
@@ -185,6 +189,13 @@ export class AuthService {
 
     const tokens = this.generateTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refresh_token);
-    return tokens;
+    delete user.password;
+    delete user.access_token;
+    delete user.refresh_token;
+    delete user.is_deleted;
+    delete user.roleIds;
+    delete user.provider;
+    delete user.providerId;
+    return {tokens,userInfo:user};
   }
 }
