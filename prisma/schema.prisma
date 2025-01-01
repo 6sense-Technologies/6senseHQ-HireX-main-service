@@ -1,0 +1,94 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  phone         String?
+  email         String   @unique
+  password      String?
+  refresh_token String?  @db.String
+  access_token  String?  @db.String
+  provider      String?  @db.String
+  providerId    String?  @db.String
+  is_verified   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  is_deleted    Boolean  @default(false)
+  roleIds       String[] @db.ObjectId
+  roles         Role[]   @relation(fields: [roleIds], references: [id])
+}
+
+model Role {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  roleName     String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  is_deleted   Boolean      @default(false)
+  users        User[]       @relation(fields: [userId], references: [id])
+  userId       String[]     @db.ObjectId
+  Permission   Permission[] @relation(fields: [permissionId], references: [id])
+  permissionId String[]     @db.ObjectId
+}
+
+model Permission {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  permissionName String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  is_deleted     Boolean  @default(false)
+  roles          Role[]   @relation(fields: [roleId], references: [id])
+  roleId         String[] @db.ObjectId
+}
+
+model Job {
+  jobId   String @id @default(auto()) @map("_id") @db.ObjectId
+  jobName String
+  deadline       DateTime
+  jobDescription String
+  jobKeywords    String[]
+  vacancy        Int
+  createdBy      String   @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  jobPosition   JobPosition @relation(fields: [jobPositionId], references: [jobPositionId])
+  jobPositionId String      @db.ObjectId
+  jobDepartmentName JobDepartment @relation(fields: [jobDepartmentId], references: [jobDpartmentId])
+  jobDepartmentId   String        @db.ObjectId
+  candidate         Candidate     @relation(fields: [candidateId], references: [candidateId])
+  candidateId       String        @db.ObjectId
+}
+
+model JobPosition {
+  jobPositionId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobPositionName String
+  createdBy       String   @db.ObjectId
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  isDeleted       Boolean
+  Job             Job[]
+}
+
+model JobDepartment {
+  jobDpartmentId    String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobDepartmentName String
+  createdBy         String   @db.ObjectId
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  isDeleted         Boolean
+  Job               Job[]
+}
+
+model Candidate {
+  candidateId String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String @unique
+  appliedJobs Job[]
+}

@@ -1,0 +1,1 @@
+{"openapi":"3.0.0","info":{"title":"Hirex","description":"API for hirex platform","version":"1.0","contact":{}},"tags":[{"name":"hirex","description":""}],"servers":[],"components":{"securitySchemes":{"bearer":{"scheme":"bearer","bearerFormat":"JWT","type":"http","name":"JWT","description":"Enter JWT Token","in":"header"}}}}
