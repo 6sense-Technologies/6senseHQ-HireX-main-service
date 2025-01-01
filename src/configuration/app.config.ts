@@ -12,4 +12,5 @@ export const appConfig: IConfig = {
   JWT_EXPIRE_REFRESH_TOKEN: process.env.JWT_EXPIRE_REFRESH_TOKEN,
   SALT_ROUND: process.env.SALT_ROUND,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 };

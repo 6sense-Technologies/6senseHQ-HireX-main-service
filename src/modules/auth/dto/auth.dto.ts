@@ -36,24 +36,33 @@ export class SignupDto {
     example: 'StrongP@ssw0rd!',
   })
   @IsString()
-  @IsStrongPassword({
-    minLength: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minSymbols: 1,
-  })
+  @IsNotEmpty()
+  @IsStrongPassword(
+    {
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minSymbols: 1,
+    },
+    {
+      message:
+        'Invalid password format.Password mustbe 8 character long and must contain minimum one uppercase,lowercase and special symbol',
+    },
+  )
   password: string;
 
   @ApiProperty({
     description: 'Array of role IDs assigned to the user',
     type: [String],
-    example: ['admin', 'hr'],
+    // example: ['admin', 'hr'],
+    example: ['interviewer'],
   })
   @IsArray()
   @ArrayNotEmpty()
   @ArrayUnique()
   @IsString({ each: true })
-  @IsIn(['admin', 'hr', 'interviewer'], { each: true })
+  // @IsIn(['admin', 'hr', 'interviewer'], { each: true })
+  @IsIn(['interviewer'], { each: true })
   roleNames: string[];
 }
 
@@ -77,7 +86,9 @@ export class LoginDto {
       minUppercase: 1,
       minSymbols: 1,
     },
-    { message: 'Invalid password format' },
+    {
+      message: 'Invalid password format.',
+    },
   )
   password: string;
 }
@@ -127,10 +138,10 @@ export class SocialLoginDto {
   provider: string;
 
   @ApiProperty({
-    description: 'The ID token issued by the social provider',
+    description: 'The auth code issued by the social provider',
     example: 'some-valid-id-token',
   })
   @IsString()
-  @IsNotEmpty({ message: 'ID token should not be empty' })
-  idToken: string;
+  @IsNotEmpty({ message: 'Auth code should not be empty' })
+  authCode: string;
 }

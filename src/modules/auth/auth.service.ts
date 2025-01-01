@@ -144,14 +144,22 @@ export class AuthService {
   }
 
   async socialLogin(dto: SocialLoginDto) {
+    console.warn(dto);
     if (dto.provider !== 'google') {
       throw new BadRequestException('Unsupported provider');
     }
 
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const client = new OAuth2Client(
+      appConfig.GOOGLE_CLIENT_ID,
+      appConfig.GOOGLE_CLIENT_SECRET,
+    );
+    const response = await client.getToken(dto.authCode);
+
+    const idToken = response.tokens.id_token;
+    console.log(idToken);
     const ticket = await client.verifyIdToken({
-      idToken: dto.idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      idToken: idToken,
+      audience: appConfig.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();

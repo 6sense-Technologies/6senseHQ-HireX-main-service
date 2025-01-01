@@ -3,52 +3,104 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  const permission1 = await prisma.permission.create({
+  // const permission1 = await prisma.permission.create({
+  //   data: {
+  //     permissionName: 'Create Job',
+  //   },
+  // });
+
+  // const permission2 = await prisma.permission.create({
+  //   data: {
+  //     permissionName: 'Create Interview',
+  //   },
+  // });
+
+  // const permission3 = await prisma.permission.create({
+  //   data: {
+  //     permissionName: 'View Interview',
+  //   },
+  // });
+
+  // await prisma.role.create({
+  //   data: {
+  //     roleName: 'admin',
+  //     Permission: {
+  //       connect: [
+  //         { id: permission1.id },
+  //         { id: permission2.id },
+  //         { id: permission3.id },
+  //       ],
+  //     },
+  //   },
+  // });
+
+  // await prisma.role.create({
+  //   data: {
+  //     roleName: 'hr',
+  //     Permission: {
+  //       connect: [{ id: permission2.id }, { id: permission3.id }],
+  //     },
+  //   },
+  // });
+
+  // await prisma.role.create({
+  //   data: {
+  //     roleName: 'interviewer',
+  //     Permission: {
+  //       connect: [{ id: permission3.id }],
+  //     },
+  //   },
+  // });
+
+  // Seed User
+  const user = await prisma.user.create({
     data: {
-      permissionName: 'Create Job',
+      name: 'Alice Smith',
+      email: 'alice.smith@example.com',
+      password: 'securepassword', // You should hash this in production
+      is_verified: true,
+      roleIds: [],
     },
   });
 
-  const permission2 = await prisma.permission.create({
+  // Seed JobPosition
+  const jobPosition = await prisma.jobPosition.create({
     data: {
-      permissionName: 'Create Interview',
+      jobPositionName: 'Software Engineer',
+      createdBy: user.id,
+      isDeleted: false,
     },
   });
 
-  const permission3 = await prisma.permission.create({
+  // Seed JobDepartment
+  const jobDepartment = await prisma.jobDepartment.create({
     data: {
-      permissionName: 'View Interview',
+      jobDepartmentName: 'Engineering',
+      createdBy: user.id,
+      isDeleted: false,
     },
   });
 
-  await prisma.role.create({
+  // Seed Candidate
+  const candidate = await prisma.candidate.create({
     data: {
-      roleName: 'admin',
-      Permission: {
-        connect: [
-          { id: permission1.id },
-          { id: permission2.id },
-          { id: permission3.id },
-        ],
-      },
+      name: 'John Doe',
+      email: 'john.doe@example.com',
     },
   });
 
-  await prisma.role.create({
+  // Seed Job
+  await prisma.job.create({
     data: {
-      roleName: 'hr',
-      Permission: {
-        connect: [{ id: permission2.id }, { id: permission3.id }],
-      },
-    },
-  });
-
-  await prisma.role.create({
-    data: {
-      roleName: 'interviewer',
-      Permission: {
-        connect: [{ id: permission3.id }],
-      },
+      jobName: 'Backend Developer',
+      deadline: new Date('2025-02-01T00:00:00.000Z'),
+      jobDescription: 'Develop and maintain backend systems.',
+      jobKeywords: ['Node.js', 'Prisma', 'TypeScript'],
+      vacancy: 3,
+      createdBy: user.id, // Example ObjectId
+      jobPositionId: jobPosition.jobPositionId,
+      jobDepartmentId: jobDepartment.jobDpartmentId,
+      candidateId: candidate.candidateId,
     },
   });
 

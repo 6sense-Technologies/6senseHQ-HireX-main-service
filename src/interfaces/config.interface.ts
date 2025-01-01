@@ -8,4 +8,5 @@ export interface IConfig {
   JWT_EXPIRE_REFRESH_TOKEN: string;
   SALT_ROUND: string;
   GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
 }

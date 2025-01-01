@@ -19,7 +19,7 @@ export class JobService {
       jobDepartmentId,
       candidateId,
     } = createJobDto;
-
+    // const jobName = this.prisma.jobDepartment.findUnique(jobPositionId);
     const job = await this.prisma.job.create({
       data: {
         jobName,

@@ -82,3 +82,77 @@ export class CreateJobDto {
   @IsMongoId()
   candidateId?: string;
 }
+
+export class CreateJobDtoUsingName {
+  @ApiProperty({
+    description: 'Name of the job',
+    example: 'Software Engineer',
+  })
+  @IsString()
+  jobName: string;
+
+  @ApiProperty({
+    description: 'Deadline for the job application',
+    example: '2025-01-31T23:59:59Z',
+  })
+  @IsDate()
+  @Type(() => Date)
+  deadline: Date;
+
+  @ApiProperty({
+    description: 'Description of the job',
+    example: 'Responsible for developing software applications.',
+  })
+  @IsString()
+  jobDescription: string;
+
+  @ApiProperty({
+    description: 'List of keywords associated with the job',
+    example: ['software', 'engineer', 'developer'],
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  jobKeywords: string[];
+
+  @ApiProperty({
+    description: 'Number of vacancies available for this job',
+    example: 5,
+  })
+  @IsInt()
+  vacancy: number;
+
+  @ApiProperty({
+    description: 'Name of the user who created the job',
+    example: 'John Doe',
+  })
+  @IsString()
+  createdByName: string;
+
+  @ApiProperty({
+    description: 'Optional name of the job position',
+    example: 'Frontend Developer',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  jobPositionName?: string;
+
+  @ApiProperty({
+    description: 'Optional name of the job department',
+    example: 'Engineering',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  jobDepartmentName?: string; // Name instead of department ID
+
+  @ApiProperty({
+    description: 'Optional name of the candidate',
+    example: 'Jane Smith',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  candidateEmail?: string; // Name instead of candidate ID
+}
