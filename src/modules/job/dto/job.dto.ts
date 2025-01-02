@@ -8,6 +8,7 @@ import {
   IsEmail,
   Min,
   IsNotEmpty,
+  IsIn,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -85,7 +86,10 @@ export class CreateJobDto {
   @IsMongoId()
   candidateId?: string;
 }
-
+export class UserInfoDto {
+  userId: string;
+  email: string;
+}
 export class CreateJobDtoUsingName {
   @ApiProperty({
     description: 'Responsibility of the job',
@@ -139,6 +143,26 @@ export class CreateJobDtoUsingName {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  jobDepartmentName?: string; // Name instead of department ID
+  jobDepartmentName?: string;
+
+  @ApiProperty({
+    description: 'Array of job Interview Stages name',
+    example: ['Phone Interview', 'HR Interview'],
+    type: [String],
+  })
+  @IsArray()
+  @IsNotEmpty()
+  interviewStages: string[];
+
+  @ApiProperty({
+    description: 'Interview medium name',
+    example: 'Online-Video',
+    type: String,
+  })
+  @IsString()
+  @IsIn(['Online-Video', 'Online-Voice', 'Online-Quiz', 'Offline'], {
+    message:
+      'interviewMedium must be either Online-Video,Online-Voice,Online-Quiz,Offline.',
+  })
+  interviewMedium: string;
 }
-export class CreateJobDtoWithInterviewStage extends CreateJobDtoUsingName {}

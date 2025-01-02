@@ -1,36 +1,40 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service'; // Assuming PrismaService is in your `prisma` directory
-import { CreateJobDtoUsingName } from './dto/job.dto';
+import { CreateJobDtoUsingName, UserInfoDto } from './dto/job.dto';
+import { InterviewStage, Job } from '@prisma/client';
 
 @Injectable()
 export class JobService {
   constructor(private readonly prisma: PrismaService) {}
 
   // Create a new job
-  async createJob(createJobDto: CreateJobDtoUsingName) {
+  async createJob(
+    userInfoDTO: UserInfoDto,
+    createJobDto: CreateJobDtoUsingName,
+  ) {
     const {
       jobResponsibility,
       jobKeywords,
       vacancy,
-      createdByEmail,
       jobPositionName,
       jobDepartmentName,
+      interviewMedium,
+      interviewStages,
     } = createJobDto;
-    // console.log(createJobDto);
 
-    // const findJob = await this.prisma.job.findFirst({
-    //   where: {
-    //     jobName: jobName,
-    //   },
-    // });
-    // if (findJob) {
-    //   throw new ConflictException('Job with this name already exists');
-    // }
-    const user = await this.prisma.user.findUnique({
-      where: { email: createdByEmail },
-    });
-    if (!user) {
-      throw new BadRequestException('User with this email not found');
+    const jobInterviewStagesToAdd: InterviewStage[] = [];
+    for (let i = 0; i < interviewStages.length; i += 1) {
+      const interviewStage = await this.prisma.interviewStage.findFirst({
+        where: {
+          interviewStageName: interviewStages[i],
+        },
+      });
+      if (!interviewStage) {
+        throw new BadRequestException(
+          'One or more interview stages are invalid',
+        );
+      }
+      jobInterviewStagesToAdd.push(interviewStage);
     }
     const jobPosition = await this.prisma.jobPosition.findFirst({
       where: {
@@ -40,49 +44,71 @@ export class JobService {
     if (!jobPosition) {
       throw new BadRequestException('Job Position is not valid');
     }
-    let queryDept = 'None';
+    let job: Job;
     if (jobDepartmentName !== undefined) {
-      queryDept = jobDepartmentName;
-    }
-    const jobDepartment = await this.prisma.jobDepartment.findFirst({
-      where: {
-        jobDepartmentName: queryDept,
-      },
-    });
-    if (!jobDepartment) {
-      throw new BadRequestException('Job department is not valid');
-    }
-    const createUserId = user.id;
+      const jobDepartment = await this.prisma.jobDepartment.findFirst({
+        where: {
+          jobDepartmentName: jobDepartmentName,
+        },
+      });
+      if (!jobDepartment) {
+        throw new BadRequestException('Job department is not valid');
+      }
 
-    const createjobDepartmentId = jobDepartment?.jobDepartmentId;
-    const createjobPositionId = jobPosition?.jobPositionId;
-
-    const job = await this.prisma.job.create({
-      data: {
-        jobResponsibility,
-        jobKeywords,
-        vacancy,
-        createdBy: createUserId,
-        jobDepartmentId: createjobDepartmentId,
-        jobPositionId: createjobPositionId,
-      },
-    });
+      job = await this.prisma.job.create({
+        data: {
+          jobResponsibility,
+          jobKeywords,
+          vacancy,
+          createdBy: userInfoDTO.userId,
+          jobDepartmentId: jobDepartment.jobDepartmentId,
+          jobPositionId: jobPosition.jobPositionId,
+        },
+      });
+      job['jobDepartmentName'] = jobDepartment.jobDepartmentName;
+    } else {
+      job = await this.prisma.job.create({
+        data: {
+          jobResponsibility,
+          jobKeywords,
+          vacancy,
+          createdBy: userInfoDTO.userId,
+          jobPositionId: jobPosition.jobPositionId,
+        },
+      });
+    }
+    const stagesAdded = [];
+    for (let i = 0; i < jobInterviewStagesToAdd.length; i += 1) {
+      const stage = await this.prisma.jobInterviewStage.create({
+        data: {
+          interviewStageId: jobInterviewStagesToAdd[i].interviewStageId,
+          interviewType: interviewMedium,
+          interviewFormat: 'structured',
+          jobId: job.jobId,
+          createdBy: userInfoDTO.userId,
+        },
+      });
+      stagesAdded.push(stage);
+    }
     delete job.createdBy;
     delete job.jobPositionId;
     delete job.jobDepartmentId;
-    job['jobPositionName'] = jobPosition.jobPositionName;
-    job['jobDepartmentName'] = jobDepartment.jobDepartmentName;
     delete job.deadline;
+    job['jobPositionName'] = jobPosition.jobPositionName;
+    job['stages'] = stagesAdded;
     return job;
   }
   async listJobs() {
     const jobs = await this.prisma.job.findMany();
     for (let i = 0; i < jobs.length; i += 1) {
-      const department = await this.prisma.jobDepartment.findFirst({
-        where: {
-          jobDepartmentId: jobs[i].jobDepartmentId,
-        },
-      });
+      let department = null;
+      if (jobs[i].jobDepartmentId != null) {
+        department = await this.prisma.jobDepartment.findFirst({
+          where: {
+            jobDepartmentId: jobs[i].jobDepartmentId,
+          },
+        });
+      }
       const position = await this.prisma.jobPosition.findFirst({
         where: {
           jobPositionId: jobs[i].jobPositionId,
@@ -91,7 +117,9 @@ export class JobService {
       delete jobs[i].jobDepartmentId;
       delete jobs[i].jobPositionId;
       delete jobs[i].deadline;
-      jobs[i]['jobDepartmentName'] = department.jobDepartmentName;
+      if (department !== null) {
+        jobs[i]['jobDepartmentName'] = department.jobDepartmentName;
+      }
       jobs[i]['jobPositionName'] = position.jobPositionName;
     }
     return jobs;

@@ -9,15 +9,17 @@ import * as compression from 'compression';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { SentryFilter } from './sentry/sentry.filter';
 import { appConfig } from './configuration/app.config';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 // import { writeFile } from 'fs/promises';
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync('./server.key'),
-    cert: fs.readFileSync('./server.cert'),
-  };
+  // const httpsOptions = {
+  //   key: fs.readFileSync('./server.key'),
+  //   cert: fs.readFileSync('./server.cert'),
+  // };
 
-  const app = await NestFactory.create(AppModule, { httpsOptions });
+  // const app = await NestFactory.create(AppModule, { httpsOptions });
+  const app = await NestFactory.create(AppModule);
+
   const appLogger = new Logger('HireX logger', { timestamp: true });
   app.useGlobalPipes(new ValidationPipe());
   appLogger.log('Enabled validation pipe....OK');

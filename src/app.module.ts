@@ -12,6 +12,8 @@ import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JobModule } from './modules/job/job.module';
+import { JobDepartmentModule } from './modules/job-department/job-department.module';
+import { JobPositionModule } from './modules/job-position/job-position.module';
 @Module({
   imports: [
     SentryModule.forRoot(),
@@ -42,6 +44,8 @@ import { JobModule } from './modules/job/job.module';
     RoleModule,
     PermissionModule,
     JobModule,
+    JobDepartmentModule,
+    JobPositionModule,
   ],
   controllers: [AppController],
   providers: [

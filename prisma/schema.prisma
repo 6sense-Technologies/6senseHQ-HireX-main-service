@@ -57,12 +57,13 @@ model Job {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  jobPosition       JobPosition    @relation(fields: [jobPositionId], references: [jobPositionId])
-  jobPositionId     String         @db.ObjectId
-  jobDepartmentName JobDepartment? @relation(fields: [jobDepartmentId], references: [jobDepartmentId])
-  jobDepartmentId   String?        @db.ObjectId
-  candidate         Candidate[]    @relation(fields: [candidateId], references: [candidateId])
-  candidateId       String[]       @db.ObjectId
+  jobPosition       JobPosition         @relation(fields: [jobPositionId], references: [jobPositionId])
+  jobPositionId     String              @db.ObjectId
+  jobDepartmentName JobDepartment?      @relation(fields: [jobDepartmentId], references: [jobDepartmentId])
+  jobDepartmentId   String?             @db.ObjectId
+  candidate         Candidate[]         @relation(fields: [candidateId], references: [candidateId])
+  candidateId       String[]            @db.ObjectId
+  JobInterviewStage JobInterviewStage[]
 }
 
 model JobPosition {
@@ -94,20 +95,18 @@ model Candidate {
 }
 
 model InterviewStage {
-  interviewStageId   String   @id @default(cuid()) @map("_id")
+  interviewStageId   String   @id @default(auto()) @map("_id") @db.ObjectId
   interviewStageName String
   createdBy          String   @db.ObjectId()
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   isDeleted          Boolean  @default(false)
 
-  JobInterviewStages JobInterviewStage[]
+  jobInterviewStages JobInterviewStage[]
 }
 
 model JobInterviewStage {
-  jobInterviewStageId String   @id @default(cuid()) @map("_id")
-  jobId               String
-  interviewStageId    String
+  jobInterviewStageId String   @id @default(auto()) @map("_id") @db.ObjectId
   interviewFormat     String
   interviewType       String
   createdBy           String   @db.ObjectId()
@@ -115,5 +114,9 @@ model JobInterviewStage {
   updatedAt           DateTime @updatedAt
   isDeleted           Boolean  @default(false)
 
-  InterviewStage InterviewStage @relation(fields: [interviewStageId], references: [interviewStageId])
+  interviewStage   InterviewStage @relation(fields: [interviewStageId], references: [interviewStageId])
+  interviewStageId String         @db.ObjectId
+
+  job   Job?    @relation(fields: [jobId], references: [jobId])
+  jobId String? @db.ObjectId
 }
