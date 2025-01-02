@@ -55,9 +55,9 @@ async function main() {
   // Seed User
   const user = await prisma.user.create({
     data: {
-      name: 'Alice Smith',
-      email: 'alice.smith@example.com',
-      password: 'securepassword', // You should hash this in production
+      name: 'Alice Smith00999',
+      email: 'alice.smith000999@example.com',
+      password: 'securepassword',
       is_verified: true,
       roleIds: [],
     },
@@ -71,7 +71,20 @@ async function main() {
       isDeleted: false,
     },
   });
-
+  await prisma.jobPosition.create({
+    data: {
+      jobPositionName: 'None',
+      createdBy: user.id,
+      isDeleted: false,
+    },
+  });
+  await prisma.jobDepartment.create({
+    data: {
+      jobDepartmentName: 'None',
+      createdBy: user.id,
+      isDeleted: false,
+    },
+  });
   // Seed JobDepartment
   const jobDepartment = await prisma.jobDepartment.create({
     data: {
@@ -82,28 +95,46 @@ async function main() {
   });
 
   // Seed Candidate
-  const candidate = await prisma.candidate.create({
-    data: {
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-    },
-  });
+  // const candidate = await prisma.candidate.create({
+  //   data: {
+  //     name: 'John Doe',
+  //     email: 'john.doe@example.com',
+  //   },
+  // });
 
   // Seed Job
-  await prisma.job.create({
+  const job = await prisma.job.create({
     data: {
-      jobName: 'Backend Developer',
-      deadline: new Date('2025-02-01T00:00:00.000Z'),
-      jobDescription: 'Develop and maintain backend systems.',
+      deadline: '',
+      jobResponsibility: 'Develop and maintain backend systems.',
       jobKeywords: ['Node.js', 'Prisma', 'TypeScript'],
       vacancy: 3,
       createdBy: user.id, // Example ObjectId
       jobPositionId: jobPosition.jobPositionId,
-      jobDepartmentId: jobDepartment.jobDpartmentId,
-      candidateId: candidate.candidateId,
+      jobDepartmentId: jobDepartment.jobDepartmentId,
     },
   });
-
+  const phoneInterview = await prisma.interviewStage.create({
+    data: {
+      interviewStageName: 'Phone Interview',
+      createdBy: user.id,
+    },
+  });
+  await prisma.interviewStage.create({
+    data: {
+      interviewStageName: 'HR Interview',
+      createdBy: user.id,
+    },
+  });
+  await prisma.jobInterviewStage.create({
+    data: {
+      jobId: job.jobId,
+      interviewStageId: phoneInterview.interviewStageId,
+      interviewFormat: 'Online Video',
+      interviewType: 'Onlines',
+      createdBy: user.id,
+    },
+  });
   console.log('Seeding finished!');
 }
 

@@ -16,7 +16,6 @@ import {
 } from './dto/auth.dto';
 import { OAuth2Client } from 'google-auth-library';
 import { appConfig } from 'src/configuration/app.config';
-import axios from 'axios';
 @Injectable()
 export class AuthService {
   constructor(
@@ -149,18 +148,17 @@ export class AuthService {
     if (dto.provider !== 'google') {
       throw new BadRequestException('Unsupported provider');
     }
-    console.log(appConfig.GOOGLE_CLIENT_ID)
-    console.log(appConfig.GOOGLE_CLIENT_SECRET)
+    console.log('CLIENTID: ' + appConfig.GOOGLE_CLIENT_ID);
+    console.log('CLIENT SECRET: ' + appConfig.GOOGLE_CLIENT_SECRET);
     const client = new OAuth2Client(
       appConfig.GOOGLE_CLIENT_ID,
       appConfig.GOOGLE_CLIENT_SECRET,
-      'postmessage'
+      'postmessage',
     );
-    
+
     const response = await client.getToken(dto.authCode);
-    
+
     const idToken = response.tokens.id_token;
- 
     const ticket = await client.verifyIdToken({
       idToken: idToken,
       audience: appConfig.GOOGLE_CLIENT_ID,
@@ -172,7 +170,7 @@ export class AuthService {
     }
 
     const { email, name, sub } = payload;
-
+    console.log(payload);
     let user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
       user = await this.prisma.user.create({
@@ -196,6 +194,6 @@ export class AuthService {
     delete user.roleIds;
     delete user.provider;
     delete user.providerId;
-    return {tokens,userInfo:user};
+    return { tokens, userInfo: user };
   }
 }

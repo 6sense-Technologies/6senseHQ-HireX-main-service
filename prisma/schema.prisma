@@ -48,22 +48,21 @@ model Permission {
 }
 
 model Job {
-  jobId   String @id @default(auto()) @map("_id") @db.ObjectId
-  jobName String
-  deadline       DateTime
-  jobDescription String
-  jobKeywords    String[]
-  vacancy        Int
-  createdBy      String   @db.ObjectId
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  jobId             String   @id @default(auto()) @map("_id") @db.ObjectId
+  deadline          String?
+  jobResponsibility String
+  jobKeywords       String[]
+  vacancy           Int
+  createdBy         String   @db.ObjectId
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  jobPosition   JobPosition @relation(fields: [jobPositionId], references: [jobPositionId])
-  jobPositionId String      @db.ObjectId
-  jobDepartmentName JobDepartment @relation(fields: [jobDepartmentId], references: [jobDpartmentId])
-  jobDepartmentId   String        @db.ObjectId
-  candidate         Candidate     @relation(fields: [candidateId], references: [candidateId])
-  candidateId       String        @db.ObjectId
+  jobPosition       JobPosition    @relation(fields: [jobPositionId], references: [jobPositionId])
+  jobPositionId     String         @db.ObjectId
+  jobDepartmentName JobDepartment? @relation(fields: [jobDepartmentId], references: [jobDepartmentId])
+  jobDepartmentId   String?        @db.ObjectId
+  candidate         Candidate[]    @relation(fields: [candidateId], references: [candidateId])
+  candidateId       String[]       @db.ObjectId
 }
 
 model JobPosition {
@@ -77,7 +76,7 @@ model JobPosition {
 }
 
 model JobDepartment {
-  jobDpartmentId    String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobDepartmentId   String   @id @default(auto()) @map("_id") @db.ObjectId
   jobDepartmentName String
   createdBy         String   @db.ObjectId
   createdAt         DateTime @default(now())
@@ -87,8 +86,34 @@ model JobDepartment {
 }
 
 model Candidate {
-  candidateId String @id @default(auto()) @map("_id") @db.ObjectId
+  candidateId String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  email       String @unique
-  appliedJobs Job[]
+  email       String   @unique
+  jobs        Job[]    @relation(fields: [jobId], references: [jobId])
+  jobId       String[] @db.ObjectId
+}
+
+model InterviewStage {
+  interviewStageId   String   @id @default(cuid()) @map("_id")
+  interviewStageName String
+  createdBy          String   @db.ObjectId()
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  isDeleted          Boolean  @default(false)
+
+  JobInterviewStages JobInterviewStage[]
+}
+
+model JobInterviewStage {
+  jobInterviewStageId String   @id @default(cuid()) @map("_id")
+  jobId               String
+  interviewStageId    String
+  interviewFormat     String
+  interviewType       String
+  createdBy           String   @db.ObjectId()
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  isDeleted           Boolean  @default(false)
+
+  InterviewStage InterviewStage @relation(fields: [interviewStageId], references: [interviewStageId])
 }

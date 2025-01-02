@@ -5,6 +5,9 @@ import {
   IsDate,
   IsMongoId,
   IsOptional,
+  IsEmail,
+  Min,
+  IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -85,26 +88,12 @@ export class CreateJobDto {
 
 export class CreateJobDtoUsingName {
   @ApiProperty({
-    description: 'Name of the job',
-    example: 'Software Engineer',
-  })
-  @IsString()
-  jobName: string;
-
-  @ApiProperty({
-    description: 'Deadline for the job application',
-    example: '2025-01-31T23:59:59Z',
-  })
-  @IsDate()
-  @Type(() => Date)
-  deadline: Date;
-
-  @ApiProperty({
-    description: 'Description of the job',
+    description: 'Responsibility of the job',
     example: 'Responsible for developing software applications.',
   })
+  @IsNotEmpty()
   @IsString()
-  jobDescription: string;
+  jobResponsibility: string;
 
   @ApiProperty({
     description: 'List of keywords associated with the job',
@@ -119,22 +108,26 @@ export class CreateJobDtoUsingName {
     description: 'Number of vacancies available for this job',
     example: 5,
   })
+  @IsNotEmpty()
   @IsInt()
+  @Min(1)
   vacancy: number;
 
   @ApiProperty({
-    description: 'Name of the user who created the job',
-    example: 'John Doe',
+    description: 'Email address of user',
+    example: 'johndoe@example.com',
   })
   @IsString()
-  createdByName: string;
+  @IsNotEmpty()
+  @IsEmail()
+  createdByEmail: string;
 
   @ApiProperty({
     description: 'Optional name of the job position',
-    example: 'Frontend Developer',
+    example: 'Software Engineer',
     required: false,
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   jobPositionName?: string;
 
@@ -144,15 +137,8 @@ export class CreateJobDtoUsingName {
     required: false,
   })
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
   jobDepartmentName?: string; // Name instead of department ID
-
-  @ApiProperty({
-    description: 'Optional name of the candidate',
-    example: 'Jane Smith',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  candidateEmail?: string; // Name instead of candidate ID
 }
+export class CreateJobDtoWithInterviewStage extends CreateJobDtoUsingName {}

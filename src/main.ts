@@ -12,11 +12,12 @@ import { appConfig } from './configuration/app.config';
 import * as fs from 'fs';
 // import { writeFile } from 'fs/promises';
 async function bootstrap() {
-  // const httpsOptions = {
-  //   key: fs.readFileSync('./server.key'),
-  //   cert: fs.readFileSync('./server.cert'),
-  // };
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.cert'),
+  };
+
+  const app = await NestFactory.create(AppModule, { httpsOptions });
   const appLogger = new Logger('HireX logger', { timestamp: true });
   app.useGlobalPipes(new ValidationPipe());
   appLogger.log('Enabled validation pipe....OK');
@@ -38,7 +39,7 @@ async function bootstrap() {
   const port = configService.get('APP_PORT');
   app.use(compression()); //compression
   appLogger.log('Using Compresson module....OK');
-  
+  app.use(helmet()); //helmet
   appLogger.log('Using Helmet module....OK');
   appLogger.log(appConfig);
   const config = new DocumentBuilder()
@@ -66,7 +67,7 @@ async function bootstrap() {
 
   appLogger.log('intialized swagger use /api to access');
   appLogger.log('App running on port: ' + port);
-  app.use(helmet()); //helmet
+
   await app.listen(port, configService.get('LAN_IP'));
 }
 bootstrap();

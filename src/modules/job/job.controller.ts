@@ -1,17 +1,17 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { JobService } from './job.service';
-import { CreateJobDto } from './dto/job.dto';
+import { CreateJobDtoUsingName } from './dto/job.dto';
 
-@Controller('jobs')
+@Controller('job')
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
-  @Post()
-  async create(@Body() createJobDto: CreateJobDto) {
+  @Post('create')
+  async create(@Body() createJobDto: CreateJobDtoUsingName) {
     return this.jobService.createJob(createJobDto);
   }
 
-  @Get()
+  @Get('list')
   async list() {
     return this.jobService.listJobs();
   }
