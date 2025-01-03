@@ -18,21 +18,29 @@ export class JobService {
       vacancy,
       jobPositionName,
       jobDepartmentName,
-      interviewMedium,
       interviewStages,
     } = createJobDto;
 
+    const vacancyNumber = parseInt(vacancy);
+    if (vacancyNumber < 1) {
+      throw new BadRequestException('Vacancy can not be 0 or negetive');
+    }
     const jobInterviewStagesToAdd: InterviewStage[] = [];
     for (let i = 0; i < interviewStages.length; i += 1) {
-      const interviewStage = await this.prisma.interviewStage.findFirst({
-        where: {
-          interviewStageName: interviewStages[i],
-        },
-      });
+      const interviewStage: InterviewStage =
+        await this.prisma.interviewStage.findFirst({
+          where: {
+            interviewStageName: interviewStages[i].interviewStageName,
+          },
+        });
       if (!interviewStage) {
-        throw new BadRequestException(
-          'One or more interview stages are invalid',
-        );
+        // interviewStage = await this.prisma.interviewStage.create({
+        //   data: {
+        //     interviewStageName: interviewStages[i].interviewStageName,
+        //     createdBy: userInfoDTO.userId,
+        //   },
+        // });//use let
+        throw new BadRequestException('One or more interview stage is invalid');
       }
       jobInterviewStagesToAdd.push(interviewStage);
     }
@@ -45,7 +53,11 @@ export class JobService {
       throw new BadRequestException('Job Position is not valid');
     }
     let job: Job;
-    if (jobDepartmentName !== undefined) {
+    if (
+      jobDepartmentName !== undefined &&
+      jobDepartmentName !== '' &&
+      jobDepartmentName !== null
+    ) {
       const jobDepartment = await this.prisma.jobDepartment.findFirst({
         where: {
           jobDepartmentName: jobDepartmentName,
@@ -59,7 +71,7 @@ export class JobService {
         data: {
           jobResponsibility,
           jobKeywords,
-          vacancy,
+          vacancy: vacancyNumber,
           createdBy: userInfoDTO.userId,
           jobDepartmentId: jobDepartment.jobDepartmentId,
           jobPositionId: jobPosition.jobPositionId,
@@ -71,7 +83,7 @@ export class JobService {
         data: {
           jobResponsibility,
           jobKeywords,
-          vacancy,
+          vacancy: vacancyNumber,
           createdBy: userInfoDTO.userId,
           jobPositionId: jobPosition.jobPositionId,
         },
@@ -82,7 +94,7 @@ export class JobService {
       const stage = await this.prisma.jobInterviewStage.create({
         data: {
           interviewStageId: jobInterviewStagesToAdd[i].interviewStageId,
-          interviewType: interviewMedium,
+          interviewType: jobInterviewStagesToAdd[i].interviewStageName,
           interviewFormat: 'structured',
           jobId: job.jobId,
           createdBy: userInfoDTO.userId,
@@ -98,6 +110,7 @@ export class JobService {
     job['stages'] = stagesAdded;
     return job;
   }
+
   async listJobs() {
     const jobs = await this.prisma.job.findMany();
     for (let i = 0; i < jobs.length; i += 1) {
@@ -114,6 +127,11 @@ export class JobService {
           jobPositionId: jobs[i].jobPositionId,
         },
       });
+      const interviewStages = await this.prisma.jobInterviewStage.findMany({
+        where: {
+          jobId: jobs[i].jobId,
+        },
+      });
       delete jobs[i].jobDepartmentId;
       delete jobs[i].jobPositionId;
       delete jobs[i].deadline;
@@ -121,6 +139,7 @@ export class JobService {
         jobs[i]['jobDepartmentName'] = department.jobDepartmentName;
       }
       jobs[i]['jobPositionName'] = position.jobPositionName;
+      jobs[i]['interviewStages'] = interviewStages;
     }
     return jobs;
   }

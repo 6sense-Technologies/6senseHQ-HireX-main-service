@@ -14,6 +14,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JobModule } from './modules/job/job.module';
 import { JobDepartmentModule } from './modules/job-department/job-department.module';
 import { JobPositionModule } from './modules/job-position/job-position.module';
+import { InterviewstageModule } from './modules/interviewstage/interviewstage.module';
 @Module({
   imports: [
     SentryModule.forRoot(),
@@ -46,6 +47,7 @@ import { JobPositionModule } from './modules/job-position/job-position.module';
     JobModule,
     JobDepartmentModule,
     JobPositionModule,
+    InterviewstageModule,
   ],
   controllers: [AppController],
   providers: [

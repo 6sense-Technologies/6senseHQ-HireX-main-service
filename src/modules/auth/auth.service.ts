@@ -155,10 +155,15 @@ export class AuthService {
       appConfig.GOOGLE_CLIENT_SECRET,
       'postmessage',
     );
-
-    const response = await client.getToken(dto.authCode);
-
+    let response;
+    try {
+      response = await client.getToken(dto.authCode);
+    } catch (error) {
+      console.log(error);
+    }
     const idToken = response.tokens.id_token;
+    // const client = new OAuth2Client(appConfig.GOOGLE_CLIENT_ID);
+
     const ticket = await client.verifyIdToken({
       idToken: idToken,
       audience: appConfig.GOOGLE_CLIENT_ID,

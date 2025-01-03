@@ -5,10 +5,11 @@ import {
   IsDate,
   IsMongoId,
   IsOptional,
-  IsEmail,
-  Min,
   IsNotEmpty,
   IsIn,
+  ValidateNested,
+  ArrayNotEmpty,
+  IsNumberString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -90,6 +91,30 @@ export class UserInfoDto {
   userId: string;
   email: string;
 }
+export class InterviewStageDto {
+  @ApiProperty({
+    description: 'Name of the interview stage',
+    example: 'Phone Interview',
+    type: String,
+  })
+  @IsString({ message: 'Interview Stage must be a string' })
+  @IsNotEmpty({ message: 'Interview Stage must not be empty' })
+  interviewStageName: string;
+
+  @ApiProperty({
+    description: 'Interview medium name',
+    example: 'Online-Video',
+    type: String,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(['Online-Video', 'Online-Voice', 'Online-Quiz', 'Offline'], {
+    message:
+      'interviewMedium must be either Online-Video, Online-Voice, Online-Quiz or Offline.',
+  })
+  interviewMedium: string;
+}
+
 export class CreateJobDtoUsingName {
   @ApiProperty({
     description: 'Responsibility of the job',
@@ -105,6 +130,7 @@ export class CreateJobDtoUsingName {
     type: [String],
   })
   @IsArray()
+  @ArrayNotEmpty()
   @IsString({ each: true })
   jobKeywords: string[];
 
@@ -113,18 +139,8 @@ export class CreateJobDtoUsingName {
     example: 5,
   })
   @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  vacancy: number;
-
-  @ApiProperty({
-    description: 'Email address of user',
-    example: 'johndoe@example.com',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
-  createdByEmail: string;
+  @IsNumberString()
+  vacancy: string;
 
   @ApiProperty({
     description: 'Optional name of the job position',
@@ -133,7 +149,7 @@ export class CreateJobDtoUsingName {
   })
   @IsNotEmpty()
   @IsString()
-  jobPositionName?: string;
+  jobPositionName: string;
 
   @ApiProperty({
     description: 'Optional name of the job department',
@@ -141,28 +157,23 @@ export class CreateJobDtoUsingName {
     required: false,
   })
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
   jobDepartmentName?: string;
 
   @ApiProperty({
-    description: 'Array of job Interview Stages name',
-    example: ['Phone Interview', 'HR Interview'],
-    type: [String],
+    description: 'Array of interview stages with their medium',
+    example: [
+      {
+        interviewStageName: 'Phone Interview',
+        interviewMedium: 'Online-Video',
+      },
+      { interviewStageName: 'HR Interview', interviewMedium: 'Offline' },
+    ],
+    type: [InterviewStageDto],
   })
   @IsArray()
-  @IsNotEmpty()
-  interviewStages: string[];
-
-  @ApiProperty({
-    description: 'Interview medium name',
-    example: 'Online-Video',
-    type: String,
-  })
-  @IsString()
-  @IsIn(['Online-Video', 'Online-Voice', 'Online-Quiz', 'Offline'], {
-    message:
-      'interviewMedium must be either Online-Video,Online-Voice,Online-Quiz,Offline.',
-  })
-  interviewMedium: string;
+  @ValidateNested({ each: true })
+  @Type(() => InterviewStageDto)
+  @ArrayNotEmpty()
+  interviewStages: InterviewStageDto[];
 }

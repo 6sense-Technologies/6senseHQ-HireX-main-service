@@ -9,6 +9,7 @@ import {
   ArrayUnique,
   IsIn,
   Matches,
+  ArrayMaxSize,
 } from 'class-validator';
 
 export class SignupDto {
@@ -61,8 +62,9 @@ export class SignupDto {
   @ArrayNotEmpty()
   @ArrayUnique()
   @IsString({ each: true })
-  // @IsIn(['admin', 'hr', 'interviewer'], { each: true })
-  @IsIn(['interviewer'], { each: true })
+  @IsIn(['admin', 'hr', 'interviewer'], { each: true })
+  @ArrayMaxSize(1)
+  // @IsIn(['interviewer'], { each: true })
   roleNames: string[];
 }
 
