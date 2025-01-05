@@ -9,21 +9,23 @@ import * as compression from 'compression';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { SentryFilter } from './sentry/sentry.filter';
 import { appConfig } from './configuration/app.config';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 // import { writeFile } from 'fs/promises';
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync('./server.key'),
-    cert: fs.readFileSync('./server.cert'),
-  };
+  // const httpsOptions = {
+  //   key: fs.readFileSync('./server.key'),
+  //   cert: fs.readFileSync('./server.cert'),
+  // };
 
-  const app = await NestFactory.create(AppModule, { httpsOptions });
+  const app = await NestFactory.create(AppModule);
+
   // const app = await NestFactory.create(AppModule);
 
   const appLogger = new Logger('HireX logger', { timestamp: true });
   app.useGlobalPipes(new ValidationPipe());
   appLogger.log('Enabled validation pipe....OK');
-
+  appLogger.log('Using Compresson module....OK');
+  app.use(helmet()); //helmet
   // // Enable CORS for external access
   // app.enableCors({
   //   origin: '*', // Allow all origins (adjust for production)
@@ -40,8 +42,7 @@ async function bootstrap() {
 
   const port = configService.get('APP_PORT');
   app.use(compression()); //compression
-  appLogger.log('Using Compresson module....OK');
-  app.use(helmet()); //helmet
+
   appLogger.log('Using Helmet module....OK');
   appLogger.log(appConfig);
   const config = new DocumentBuilder()

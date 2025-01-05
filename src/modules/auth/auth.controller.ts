@@ -40,6 +40,7 @@ export class AuthController {
   socialLogin(@Body() dto: SocialLoginDto) {
     return this.authService.socialLogin(dto);
   }
+
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get('check-login')

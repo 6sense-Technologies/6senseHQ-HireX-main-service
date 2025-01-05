@@ -155,15 +155,16 @@ export class AuthService {
       appConfig.GOOGLE_CLIENT_SECRET,
       'postmessage',
     );
-    let response;
-    try {
-      response = await client.getToken(dto.authCode);
-    } catch (error) {
-      console.log(error);
-    }
-    const idToken = response.tokens.id_token;
+    // let response;
+    // try {
+    //   response = await client.getToken(dto.authCode);
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    const idToken = dto.idToken;
     // const client = new OAuth2Client(appConfig.GOOGLE_CLIENT_ID);
-
+    // // const whatIsAccess = await client.getTokenInfo(dto.access_token);
+    // console.log('WHAT IS ACCESS: ' + whatIsAccess);
     const ticket = await client.verifyIdToken({
       idToken: idToken,
       audience: appConfig.GOOGLE_CLIENT_ID,

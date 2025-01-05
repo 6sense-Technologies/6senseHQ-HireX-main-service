@@ -140,10 +140,10 @@ export class SocialLoginDto {
   provider: string;
 
   @ApiProperty({
-    description: 'The auth code issued by the social provider',
+    description: 'Id Token',
     example: 'some-valid-id-token',
   })
   @IsString()
-  @IsNotEmpty({ message: 'Auth code should not be empty' })
-  authCode: string;
+  @IsNotEmpty({ message: 'Id Token should not be empty' })
+  idToken: string;
 }
