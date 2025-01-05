@@ -22,7 +22,10 @@ export class InterviewstageController {
   }
 
   @Get('list')
-  async getInterviewStageList() {
-    return this.interviewStage.list();
+  async getInterviewStageList(@Req() req) {
+    return this.interviewStage.list({
+      userId: req.user.userId,
+      email: req.user.email,
+    });
   }
 }
