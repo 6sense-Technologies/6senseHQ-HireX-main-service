@@ -15,7 +15,7 @@ import {
   EmailAndRefreshTokenDto,
 } from './dto/auth.dto';
 import { OAuth2Client } from 'google-auth-library';
-import { appConfig } from 'src/configuration/app.config';
+import { appConfig } from '../../configuration/app.config';
 @Injectable()
 export class AuthService {
   constructor(
@@ -165,11 +165,15 @@ export class AuthService {
     // const client = new OAuth2Client(appConfig.GOOGLE_CLIENT_ID);
     // // const whatIsAccess = await client.getTokenInfo(dto.access_token);
     // console.log('WHAT IS ACCESS: ' + whatIsAccess);
-    const ticket = await client.verifyIdToken({
-      idToken: idToken,
-      audience: appConfig.GOOGLE_CLIENT_ID,
-    });
 
+    const ticket = await client
+      .verifyIdToken({
+        idToken: idToken,
+        audience: appConfig.GOOGLE_CLIENT_ID,
+      })
+      .catch(() => {
+        throw new UnauthorizedException('Invalid Token');
+      });
     const payload = ticket.getPayload();
     if (!payload) {
       throw new UnauthorizedException('Invalid token');
