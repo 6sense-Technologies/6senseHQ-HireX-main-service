@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, UseGuards } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../../prisma.service';
 import { OnlyInterviewStage } from './dto/interviewstage.dto';
 import { UserInfoDto } from '../job/dto/job.dto';
 @UseGuards()
@@ -23,7 +23,19 @@ export class InterviewstageService {
       },
     });
   }
-  async list() {
-    return await this.prisma.interviewStage.findMany();
+  async list(userdto: UserInfoDto) {
+    const interviewStages = await this.prisma.interviewStage.findMany({
+      where: {
+        OR: [
+          { createdBy: userdto.userId },
+          {
+            interviewStageName: {
+              in: ['Phone Interview', 'HR Interview'],
+            },
+          },
+        ],
+      },
+    });
+    return interviewStages;
   }
 }
