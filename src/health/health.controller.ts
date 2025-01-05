@@ -6,7 +6,7 @@ import {
   HttpHealthIndicator,
 } from '@nestjs/terminus';
 import { PrismaHealthIndicator } from '@nestjs/terminus';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 @Controller('health')
 export class HealthController {
   constructor(
@@ -23,8 +23,6 @@ export class HealthController {
     return this.health.check([
       () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com/'),
       () => this.http.pingCheck('sentry-endpoint', 'https://sentry.io'),
-      () =>
-        this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.8 }),
       () => this.prismaorm.pingCheck('Mongodb-check', this.prismaService),
     ]);
   }
