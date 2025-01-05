@@ -5,7 +5,7 @@ import { PrismaService } from './prisma.service';
 export class AppService {
   constructor(private prisma: PrismaService) {}
   getHello(): string {
-    return 'Hirex app';
+    return 'HireX app';
   }
   async getDummyUsers(): Promise<any> {
     const result = await this.prisma.user.findMany();
