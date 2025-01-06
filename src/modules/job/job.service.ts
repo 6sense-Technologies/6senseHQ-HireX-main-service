@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service'; // Assuming PrismaService is in your `prisma` directory
-import { CreateJobDtoUsingName, UserInfoDto } from './dto/job.dto';
-import { InterviewStage, Job } from '@prisma/client';
-
+import { CreateJobDtoUsingName } from './dto/job.dto';
+import { Job } from '@prisma/client';
+import { UserInfoDto } from '../user/dto/user.dto';
 @Injectable()
 export class JobService {
   constructor(private readonly prisma: PrismaService) {}
@@ -25,24 +25,17 @@ export class JobService {
     if (vacancyNumber < 1) {
       throw new BadRequestException('Vacancy can not be 0 or negetive');
     }
-    const jobInterviewStagesToAdd: InterviewStage[] = [];
-    for (let i = 0; i < interviewStages.length; i += 1) {
-      const interviewStage: InterviewStage =
-        await this.prisma.interviewStage.findFirst({
-          where: {
-            interviewStageName: interviewStages[i].interviewStageName,
-          },
-        });
-      if (!interviewStage) {
-        // interviewStage = await this.prisma.interviewStage.create({
-        //   data: {
-        //     interviewStageName: interviewStages[i].interviewStageName,
-        //     createdBy: userInfoDTO.userId,
-        //   },
-        // });//use let
-        throw new BadRequestException('One or more interview stage is invalid');
-      }
-      jobInterviewStagesToAdd.push(interviewStage);
+    const jobInterviewStagesToAdd = await this.prisma.interviewStage.findMany({
+      where: {
+        interviewStageName: {
+          in: interviewStages.map((interviewStage) => {
+            return interviewStage.interviewStageName;
+          }),
+        },
+      },
+    });
+    if (jobInterviewStagesToAdd.length != interviewStages.length) {
+      throw new BadRequestException('One or more interview stages are invalid');
     }
     const jobPosition = await this.prisma.jobPosition.findFirst({
       where: {
@@ -89,58 +82,58 @@ export class JobService {
         },
       });
     }
-    const stagesAdded = [];
-    for (let i = 0; i < jobInterviewStagesToAdd.length; i += 1) {
-      const stage = await this.prisma.jobInterviewStage.create({
-        data: {
-          interviewStageId: jobInterviewStagesToAdd[i].interviewStageId,
-          interviewType: jobInterviewStagesToAdd[i].interviewStageName,
+
+    await this.prisma.jobInterviewStage.createMany({
+      data: jobInterviewStagesToAdd.map((jobInterviewStage) => {
+        return {
+          interviewStageId: jobInterviewStage.interviewStageId,
+          interviewType: jobInterviewStage.interviewStageName,
           interviewFormat: 'structured',
           jobId: job.jobId,
           createdBy: userInfoDTO.userId,
-        },
-      });
-      stagesAdded.push(stage);
-    }
+        };
+      }),
+    });
     delete job.createdBy;
     delete job.jobPositionId;
     delete job.jobDepartmentId;
     delete job.deadline;
     job['jobPositionName'] = jobPosition.jobPositionName;
-    job['stages'] = stagesAdded;
+    job['stages'] = jobInterviewStagesToAdd;
     return job;
   }
 
-  async listJobs() {
-    const jobs = await this.prisma.job.findMany();
-    for (let i = 0; i < jobs.length; i += 1) {
-      let department = null;
-      if (jobs[i].jobDepartmentId != null) {
-        department = await this.prisma.jobDepartment.findFirst({
-          where: {
-            jobDepartmentId: jobs[i].jobDepartmentId,
+  async listJobs(userInfoDto: UserInfoDto) {
+    const jobs = await this.prisma.job.findMany({
+      where: {
+        createdBy: userInfoDto.userId,
+      },
+      include: {
+        jobDepartment: {
+          select: {
+            jobDepartmentName: true,
           },
-        });
-      }
-      const position = await this.prisma.jobPosition.findFirst({
-        where: {
-          jobPositionId: jobs[i].jobPositionId,
         },
-      });
-      const interviewStages = await this.prisma.jobInterviewStage.findMany({
-        where: {
-          jobId: jobs[i].jobId,
+        jobPosition: {
+          select: {
+            jobPositionName: true,
+          },
         },
-      });
-      delete jobs[i].jobDepartmentId;
-      delete jobs[i].jobPositionId;
-      delete jobs[i].deadline;
-      if (department !== null) {
-        jobs[i]['jobDepartmentName'] = department.jobDepartmentName;
-      }
-      jobs[i]['jobPositionName'] = position.jobPositionName;
-      jobs[i]['interviewStages'] = interviewStages;
-    }
+        JobInterviewStage: {
+          select: {
+            interviewFormat: true,
+            interviewType: true,
+          },
+        },
+        candidate: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
     return jobs;
   }
 }

@@ -59,7 +59,7 @@ model Job {
 
   jobPosition       JobPosition         @relation(fields: [jobPositionId], references: [jobPositionId])
   jobPositionId     String              @db.ObjectId
-  jobDepartmentName JobDepartment?      @relation(fields: [jobDepartmentId], references: [jobDepartmentId])
+  jobDepartment     JobDepartment?      @relation(fields: [jobDepartmentId], references: [jobDepartmentId])
   jobDepartmentId   String?             @db.ObjectId
   candidate         Candidate[]         @relation(fields: [candidateId], references: [candidateId])
   candidateId       String[]            @db.ObjectId

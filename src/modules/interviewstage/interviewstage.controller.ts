@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { InterviewstageService } from './interviewstage.service';
 // import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { OnlyInterviewStage } from './dto/interviewstage.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { UserInfoDto } from '../user/dto/user.dto';
+import { UserInfo } from '../user/decorators/user.decorator';
 @UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 @Controller('interviewstage')
@@ -12,20 +14,14 @@ export class InterviewstageController {
 
   @Post('create')
   async createInterview(
-    @Req() req,
+    @UserInfo() userInfoDto: UserInfoDto,
     @Body() interviewStagedto: OnlyInterviewStage,
   ) {
-    return this.interviewStage.create(
-      { userId: req.user.userId, email: req.user.email },
-      interviewStagedto,
-    );
+    return this.interviewStage.create(userInfoDto, interviewStagedto);
   }
 
   @Get('list')
-  async getInterviewStageList(@Req() req) {
-    return this.interviewStage.list({
-      userId: req.user.userId,
-      email: req.user.email,
-    });
+  async getInterviewStageList(@UserInfo() userInfoDto: UserInfoDto) {
+    return this.interviewStage.list(userInfoDto);
   }
 }

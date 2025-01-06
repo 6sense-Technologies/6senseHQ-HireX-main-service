@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 import { OnlyInterviewStage } from './dto/interviewstage.dto';
-import { UserInfoDto } from '../job/dto/job.dto';
+import { UserInfoDto } from '../user/dto/user.dto';
 @UseGuards()
 @Injectable()
 export class InterviewstageService {
