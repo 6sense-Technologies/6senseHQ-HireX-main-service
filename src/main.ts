@@ -25,7 +25,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   appLogger.log('Enabled validation pipe....OK');
   appLogger.log('Using Compresson module....OK');
-  app.use(helmet()); //helmet
+
   // // Enable CORS for external access
   // app.enableCors({
   //   origin: '*', // Allow all origins (adjust for production)
@@ -67,10 +67,16 @@ async function bootstrap() {
     customSiteTitle: 'HireX app',
     url: configService.get('LAN_URL'),
   });
-
+  app.use(helmet()); //helmet
   appLogger.log('intialized swagger use /api to access');
   appLogger.log('App running on port: ' + port);
-
-  await app.listen(port, configService.get('LAN_IP'));
+  const production = true;
+  let runIp: string;
+  if (production) {
+    runIp = configService.get('PRODUCTION_IP');
+  } else {
+    runIp = configService.get('LAN_IP');
+  }
+  await app.listen(port, runIp);
 }
 bootstrap();
