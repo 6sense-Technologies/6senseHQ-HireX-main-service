@@ -134,7 +134,9 @@ export class AuthService {
     });
     if (
       !user ||
-      !(await bcrypt.compare(dto.refreshToken, user.refresh_token))
+      !(await this.jwtService.verify(dto.refreshToken, {
+        secret: appConfig.JWT_REFRESH_SECRET,
+      }))
     ) {
       throw new UnauthorizedException('Invalid refresh token');
     }

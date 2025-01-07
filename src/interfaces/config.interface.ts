@@ -13,4 +13,5 @@ export interface IConfig {
   EMAIL_USERNAME: string;
   EMAIL_PASSWORD: string;
   EMAIL_SERVICE_PORT: number;
+  EMAIL_VERIFICATION_SECRET: string;
 }

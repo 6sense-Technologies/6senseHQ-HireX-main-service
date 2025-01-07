@@ -17,4 +17,5 @@ export const appConfig: IConfig = {
   EMAIL_USERNAME: process.env.EMAIL_USERNAME,
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
   EMAIL_SERVICE_PORT: parseInt(process.env.EMAIL_SERVICE_PORT),
+  EMAIL_VERIFICATION_SECRET: process.env.EMAIL_VERIFICATION_SECRET,
 };
