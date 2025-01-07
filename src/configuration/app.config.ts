@@ -13,4 +13,8 @@ export const appConfig: IConfig = {
   SALT_ROUND: process.env.SALT_ROUND,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  EMAIL_HOST: process.env.EMAIL_HOST,
+  EMAIL_USERNAME: process.env.EMAIL_USERNAME,
+  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
+  EMAIL_SERVICE_PORT: parseInt(process.env.EMAIL_SERVICE_PORT),
 };

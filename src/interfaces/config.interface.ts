@@ -9,4 +9,8 @@ export interface IConfig {
   SALT_ROUND: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
+  EMAIL_HOST: string;
+  EMAIL_USERNAME: string;
+  EMAIL_PASSWORD: string;
+  EMAIL_SERVICE_PORT: number;
 }

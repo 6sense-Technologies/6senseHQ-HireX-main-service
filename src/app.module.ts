@@ -15,6 +15,9 @@ import { JobModule } from './modules/job/job.module';
 import { JobDepartmentModule } from './modules/job-department/job-department.module';
 import { JobPositionModule } from './modules/job-position/job-position.module';
 import { InterviewstageModule } from './modules/interviewstage/interviewstage.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailServiceModule } from './modules/email-service/email-service.module';
+import { appConfig } from './configuration/app.config';
 @Module({
   imports: [
     SentryModule.forRoot(),
@@ -39,6 +42,16 @@ import { InterviewstageModule } from './modules/interviewstage/interviewstage.mo
         limit: 100,
       },
     ]),
+    MailerModule.forRoot({
+      transport: {
+        host: appConfig.EMAIL_HOST,
+        port: appConfig.EMAIL_SERVICE_PORT,
+        auth: {
+          user: appConfig.EMAIL_USERNAME,
+          pass: appConfig.EMAIL_PASSWORD,
+        },
+      },
+    }),
     HealthModule,
     AuthModule,
     UserModule,
@@ -48,6 +61,7 @@ import { InterviewstageModule } from './modules/interviewstage/interviewstage.mo
     JobDepartmentModule,
     JobPositionModule,
     InterviewstageModule,
+    EmailServiceModule,
   ],
   controllers: [AppController],
   providers: [
