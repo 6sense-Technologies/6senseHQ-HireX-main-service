@@ -1,0 +1,17 @@
+{
+  "extends": ["config:base"],
+  "packageRules": [
+    {
+      "matchDepTypes": ["dependencies", "devDependencies"],
+      "enabled": true
+    }
+  ],
+  "automerge": {
+    "dependencies": {
+      "major": false,
+      "minor": true,
+      "patch": true
+    }
+  },
+  "schedule": ["at any time"]
+}
