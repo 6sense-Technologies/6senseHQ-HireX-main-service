@@ -3,15 +3,9 @@
   "packageRules": [
     {
       "matchDepTypes": ["dependencies", "devDependencies"],
-      "enabled": true
+      "automerge": true,
+      "updateTypes": ["minor", "patch"]
     }
   ],
-  "automerge": {
-    "dependencies": {
-      "major": false,
-      "minor": true,
-      "patch": true
-    }
-  },
   "schedule": ["at any time"]
 }
