@@ -21,7 +21,7 @@ export class EmailService {
     const emailTemplate = `Dear User,Click the link to verify: ${appConfig.EMAIL_VERIFY_URL}:${appConfig.APP_PORT}/email-service/verify/${verificationToken}`;
     console.log(emailTemplate);
     const result = await this.mailerService.sendMail({
-      from: 'Ahmed Faiyaz <***REMOVED***>',
+      from: `Ahmed Faiyaz ${appConfig.EMAIL_SENDER}`,
       to: userInfoDTO.email,
       subject: `Please Verify your account for ${userInfoDTO.email}-HireX`,
       text: emailTemplate,

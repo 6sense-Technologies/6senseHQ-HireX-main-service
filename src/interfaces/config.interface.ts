@@ -17,4 +17,5 @@ export interface IConfig {
   EMAIL_VERIFICATION_SUCCESS_REDIRECT: string;
   EMAIL_VERIFICATION_FAILED_REDIRECT: string;
   EMAIL_VERIFY_URL: string;
+  EMAIL_SENDER: string;
 }

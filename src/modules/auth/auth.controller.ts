@@ -24,6 +24,11 @@ export class AuthController {
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
+
+  @Post('v2/login')
+  loginv2(@Body() dto: LoginDto) {
+    return this.authService.loginV2(dto);
+  }
   @UseGuards(RefreshTokenGuard)
   @ApiBearerAuth()
   @Post('refresh')

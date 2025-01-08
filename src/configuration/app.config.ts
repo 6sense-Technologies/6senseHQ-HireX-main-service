@@ -23,4 +23,5 @@ export const appConfig: IConfig = {
   EMAIL_VERIFICATION_FAILED_REDIRECT:
     process.env.EMAIL_VERIFICATION_FAILED_REDIRECT,
   EMAIL_VERIFY_URL: process.env.EMAIL_VERIFY_URL,
+  EMAIL_SENDER: process.env.EMAIL_SENDER,
 };

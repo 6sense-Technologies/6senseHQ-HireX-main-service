@@ -101,7 +101,24 @@ export class AuthService {
     delete user.providerId;
     return { tokens, userInfo: user };
   }
+  async loginV2(dto: LoginDto) {
+    /// TODO: merge loginV2 with login.
+    /// Note: This is temporary.
 
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    console.log(user.is_verified);
+    if (user) {
+      if (user.is_verified) {
+        await this.login(dto);
+      } else {
+        throw new NotFoundException('User is not verified');
+      }
+    } else {
+      throw new NotFoundException('Invalid credentials');
+    }
+  }
   private generateTokens(userId: string, email: string) {
     const access_token = this.jwtService.sign(
       { userId, email },
