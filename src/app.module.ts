@@ -18,6 +18,7 @@ import { InterviewstageModule } from './modules/interviewstage/interviewstage.mo
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailServiceModule } from './modules/email-service/email-service.module';
 import { appConfig } from './configuration/app.config';
+
 @Module({
   imports: [
     SentryModule.forRoot(),

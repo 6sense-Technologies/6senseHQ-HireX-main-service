@@ -22,7 +22,11 @@ async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
 
   const appLogger = new Logger('HireX logger', { timestamp: true });
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      stopAtFirstError: true,
+    }),
+  );
   appLogger.log('Enabled validation pipe....OK');
   appLogger.log('Using Compresson module....OK');
   app.use(helmet()); //helmet
