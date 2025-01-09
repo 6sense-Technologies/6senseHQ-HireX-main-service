@@ -26,6 +26,7 @@ export class JobService {
     if (vacancyNumber < 1) {
       throw new BadRequestException('Vacancy can not be 0 or negetive');
     }
+
     const interviewStagesFound = await this.prisma.interviewStage.findMany({
       where: {
         interviewStageName: {
@@ -40,27 +41,6 @@ export class JobService {
     if (interviewStagesFound.length !== interviewStages.length) {
       throw new BadRequestException('One or more interview stages are invalid');
     }
-
-    const interviewStagesMap = interviewStages.reduce((map, interviewStage) => {
-      map[interviewStage.interviewStageName] = interviewStage.interviewMedium;
-      return map;
-    }, {});
-
-    const jobInterviewStagesToAdd = interviewStagesFound.map(
-      (interviewStageFound) => {
-        const interviewFormat =
-          interviewStagesMap[interviewStageFound.interviewStageName];
-        if (!interviewFormat) {
-          throw new BadRequestException(
-            `Interview stage ${interviewStageFound.interviewStageName} is missing a format`,
-          );
-        }
-        return {
-          ...interviewStageFound,
-          interviewType: interviewFormat,
-        };
-      },
-    );
 
     const jobPosition = await this.prisma.jobPosition.findFirst({
       where: {
@@ -107,17 +87,20 @@ export class JobService {
         },
       });
     }
-
-    await this.prisma.jobInterviewStage.createMany({
-      data: jobInterviewStagesToAdd.map((jobInterviewStage) => {
+    const jobInterviewStagesToAdd = interviewStagesFound.map(
+      (jobInterviewStage, index) => {
         return {
           interviewStageId: jobInterviewStage.interviewStageId,
-          interviewType: jobInterviewStage.interviewType,
+          interviewType: jobInterviewStage.interviewStageName,
+          interviewMedium: interviewStages[index].interviewMedium,
           interviewFormat: 'structured',
           jobId: job.jobId,
           createdBy: userInfoDTO.userId,
         };
-      }),
+      },
+    );
+    await this.prisma.jobInterviewStage.createMany({
+      data: jobInterviewStagesToAdd,
     });
     delete job.createdBy;
     delete job.jobPositionId;
@@ -130,67 +113,69 @@ export class JobService {
 
   async listJobs(
     userInfoDto: UserInfoDto,
-    offsetString: string,
-    limitString: string,
+    page: string = '1',
+    limit: string = '10',
   ) {
-    let offset: number = parseInt(offsetString);
-    let limit: number = parseInt(limitString);
-    console.log(`HIT ${offset} ${limit}`);
-    if (!offset || !limit) {
-      offset = 1;
-      limit = 5;
-    }
-    if (offset < 1 || limit < 1) {
-      offset = 1;
-      limit = 5;
-    }
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
+    const offset = (pageNumber - 1) * limitNumber;
+
     const jobs = await this.prisma.job.findMany({
-      skip: offset,
-      take: limit,
       where: {
         createdBy: userInfoDto.userId,
       },
       select: {
+        jobId: true,
         jobPosition: {
           select: {
             jobPositionName: true,
           },
         },
+        jobDepartment: {
+          select: {
+            jobDepartmentName: true,
+          },
+        },
         vacancy: true,
         createdAt: true,
-        createdBy: true,
+        createdByUser: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
+      },
+      skip: offset,
+      take: limitNumber,
+    });
+
+    const totalCount = await this.prisma.job.count({
+      where: {
+        createdBy: userInfoDto.userId,
       },
     });
-    // const jobs = await this.prisma.prismaExtended.job
-    //   .paginate()
-    //   .withPages({ limit: 10 });
-    // console.log(jobs);
-    const jobCreatedBy = [];
 
-    for (let i = 0; i < jobs.length; i += 1) {
-      jobCreatedBy.push(
-        await this.prisma.user.findUnique({
-          where: {
-            id: jobs[i].createdBy,
-          },
-        }),
-      );
-    }
-    const modifiedResponse = jobs.map((job, index) => {
-      return {
-        ...job,
-        jobPosition: job.jobPosition.jobPositionName,
-        numberOfVacancies: job.vacancy,
-        createdAt: job.createdAt.toLocaleDateString('en-GB'),
-        createdBy: jobCreatedBy[index].email,
-        vacancy: undefined,
-      };
-    });
-    return modifiedResponse;
+    return {
+      jobs: jobs.map((job) => {
+        return {
+          jobPosition: job.jobPosition.jobPositionName,
+          numberOfVacancies: job.vacancy,
+          createdBy: job.createdByUser.name,
+          createdAt: job.createdAt.toLocaleString('en-GB'),
+        };
+      }),
+      meta: {
+        totalCount,
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limitNumber),
+      },
+    };
   }
+
   async viewJob(userInfoDto: UserInfoDto, jobId: string) {
     if (!isMongoId(jobId)) {
       throw new BadRequestException('Invalid Request');
@@ -207,7 +192,6 @@ export class JobService {
         jobPosition: true,
       },
     });
-    console.log(job);
     return job;
   }
 }

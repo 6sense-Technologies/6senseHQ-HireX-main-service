@@ -127,7 +127,8 @@ async function seedJobInterviewStages(userId, jobId, interviewStageId) {
     data: {
       jobId: jobId,
       interviewStageId: interviewStageId,
-      interviewFormat: 'Online Video',
+      interviewMedium: 'Online-Video',
+      interviewFormat: 'structured',
       interviewType: 'Online',
       createdBy: userId,
     },

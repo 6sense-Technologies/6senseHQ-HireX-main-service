@@ -19,14 +19,12 @@ export class JobController {
   ) {
     return this.jobService.createJob(userInfoDTO, createJobDto);
   }
-
   @Get('list')
   async list(
     @UserInfo() userInfoDto: UserInfoDto,
-    @Query('offset') offsetString: string = '0',
-    @Query('limit') limitString: string = '5',
+    @Query('page') page: string = '1',
   ) {
-    return this.jobService.listJobs(userInfoDto, offsetString, limitString);
+    return this.jobService.listJobs(userInfoDto, page);
   }
 
   @Get('detail')

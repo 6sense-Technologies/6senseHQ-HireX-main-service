@@ -23,6 +23,7 @@ model User {
   is_deleted    Boolean  @default(false)
   roleIds       String[] @db.ObjectId
   roles         Role[]   @relation(fields: [roleIds], references: [id])
+  jobs          Job[]    @relation("userJobs")
 }
 
 model Role {
@@ -48,15 +49,14 @@ model Permission {
 }
 
 model Job {
-  jobId             String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobId             String              @id @default(auto()) @map("_id") @db.ObjectId
   deadline          String?
   jobResponsibility String
   jobKeywords       String[]
   vacancy           Int
-  createdBy         String   @db.ObjectId
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
+  createdBy         String              @db.ObjectId
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
   jobPosition       JobPosition         @relation(fields: [jobPositionId], references: [jobPositionId])
   jobPositionId     String              @db.ObjectId
   jobDepartment     JobDepartment?      @relation(fields: [jobDepartmentId], references: [jobDepartmentId])
@@ -64,6 +64,7 @@ model Job {
   candidate         Candidate[]         @relation(fields: [candidateId], references: [candidateId])
   candidateId       String[]            @db.ObjectId
   JobInterviewStage JobInterviewStage[]
+  createdByUser     User                @relation("userJobs", fields: [createdBy], references: [id])
 }
 
 model JobPosition {
@@ -109,6 +110,7 @@ model JobInterviewStage {
   jobInterviewStageId String   @id @default(auto()) @map("_id") @db.ObjectId
   interviewFormat     String
   interviewType       String
+  interviewMedium     String
   createdBy           String   @db.ObjectId()
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
