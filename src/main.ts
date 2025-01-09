@@ -29,7 +29,6 @@ async function bootstrap() {
   );
   appLogger.log('Enabled validation pipe....OK');
   appLogger.log('Using Compresson module....OK');
-  app.use(helmet()); //helmet
   // // Enable CORS for external access
   // app.enableCors({
   //   origin: '*', // Allow all origins (adjust for production)
@@ -74,7 +73,8 @@ async function bootstrap() {
 
   appLogger.log('intialized swagger use /api to access');
   appLogger.log('App running on port: ' + port);
+  app.use(helmet()); //helmet
 
-  await app.listen(port, configService.get('LAN_IP'));
+  await app.listen(port, configService.get('PRODUCTION_IP'));
 }
 bootstrap();

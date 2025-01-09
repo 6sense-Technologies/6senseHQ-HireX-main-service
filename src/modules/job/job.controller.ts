@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Query } from '@nestjs/common';
 import { JobService } from './job.service';
 import { CreateJobDtoUsingName } from './dto/job.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
@@ -21,7 +21,19 @@ export class JobController {
   }
 
   @Get('list')
-  async list(@UserInfo() userInfodto: UserInfoDto) {
-    return this.jobService.listJobs(userInfodto);
+  async list(
+    @UserInfo() userInfoDto: UserInfoDto,
+    @Query('offset') offsetString: string = '0',
+    @Query('limit') limitString: string = '5',
+  ) {
+    return this.jobService.listJobs(userInfoDto, offsetString, limitString);
+  }
+
+  @Get('detail')
+  async detail(
+    @UserInfo() userInfoDto: UserInfoDto,
+    @Query('id') jobId: string,
+  ) {
+    return this.jobService.viewJob(userInfoDto, jobId);
   }
 }

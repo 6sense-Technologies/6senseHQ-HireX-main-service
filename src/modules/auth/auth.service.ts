@@ -16,11 +16,13 @@ import {
 } from './dto/auth.dto';
 import { OAuth2Client } from 'google-auth-library';
 import { appConfig } from '../../configuration/app.config';
+import { EmailService } from '../email-service/email.service';
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async signup(dto: SignupDto) {
@@ -53,6 +55,10 @@ export class AuthService {
     delete user.provider;
     delete user.providerId;
     user['roleNames'] = dto.roleNames;
+    this.emailService.sendVerficationEmail({
+      userId: user.id,
+      email: user.email,
+    });
     return { tokens, userInfo: user };
   }
   async checkUser(email: string): Promise<boolean> {

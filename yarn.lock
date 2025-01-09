@@ -6270,6 +6270,11 @@ preview-email@^3.0.19:
     pug "^3.0.3"
     uuid "^9.0.1"
 
+prisma-extension-pagination@^0.7.5:
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/prisma-extension-pagination/-/prisma-extension-pagination-0.7.5.tgz#1ff3f1755517e32b6e13460cebf6602a8bb48a8a"
+  integrity sha512-tMcdOKryuqMrErsf14bmTKPtv25jJ0Cr1799dCr6AXZukrKf7Jz7MEtFD9VUuh+swsq1dYYJQVvmLUlzgAObyA==
+
 prisma@^6.1.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/prisma/-/prisma-6.2.0.tgz#8e31aaba41ce113424bfbe0d8ce2135e338d95c8"

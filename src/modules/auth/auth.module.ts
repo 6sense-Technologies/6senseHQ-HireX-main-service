@@ -7,6 +7,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { AuthService } from './auth.service';
 // import { appConfig } from 'src/configuration/app.config';
 import { JWTRefreshTokenStrategy } from './strategy/jwt-refresh.strategy';
+import { EmailService } from '../email-service/email.service';
 
 @Module({
   imports: [
@@ -18,6 +19,12 @@ import { JWTRefreshTokenStrategy } from './strategy/jwt-refresh.strategy';
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtStrategy, JWTRefreshTokenStrategy],
+  providers: [
+    AuthService,
+    PrismaService,
+    JwtStrategy,
+    JWTRefreshTokenStrategy,
+    EmailService,
+  ],
 })
 export class AuthModule {}
