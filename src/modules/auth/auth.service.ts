@@ -68,18 +68,20 @@ export class AuthService {
     }
   }
   async findRoleIdsByName(roleNames: string[]): Promise<string[]> {
-    const roleIds = [];
-    for (let i = 0; i < roleNames.length; i += 1) {
-      const role = await this.prisma.role.findFirst({
+    const roleIds = await this.prisma.role
+      .findMany({
         where: {
-          roleName: roleNames[i],
+          roleName: {
+            in: roleNames,
+          },
         },
-      });
-      if (!role) {
-        throw new BadRequestException('Invalid Role Name');
-      } else {
-        roleIds.push(role.id);
-      }
+        select: {
+          id: true,
+        },
+      })
+      .then((results) => results.map((role) => role.id));
+    if (roleIds.length != roleNames.length) {
+      throw new BadRequestException('One or more role ids not found');
     }
     return roleIds;
   }
