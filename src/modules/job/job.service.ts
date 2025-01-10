@@ -122,7 +122,9 @@ export class JobService {
   ) {
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
-
+    if (pageNumber < 1) {
+      throw new Error('Page number must be positive integers');
+    }
     const offset = (pageNumber - 1) * limitNumber;
 
     const jobs = await this.prisma.job.findMany({
