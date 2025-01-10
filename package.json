@@ -87,7 +87,30 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/*.dto.ts",
+      "!**/*.module.ts",
+      "!**/*.controller.ts",
+      "!**/*.spec.ts",
+      "!**/*.spec2.ts",
+      "!**/*.config.ts",
+      "!**/*.seeder.ts",
+      "!**/*.entity.ts",
+      "!**/*.interface.ts",
+      "!**/*.filter.ts",
+      "!**.interceptor.ts",
+      "!**/src/interceptors/**", 
+      "!instrument.ts",
+      "!seeder.ts",
+      "!main.ts",
+      "!index.ts",
+      "!**/*.enum.ts",
+      "!**/*.guard.ts",
+      "!**/*.decorator.ts",
+      "!**/*.validator.ts",
+      "!**/*.constants.ts",
+      "!**/*.strategy.ts",
+      "!**/*.helper.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

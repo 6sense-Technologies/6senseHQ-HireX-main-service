@@ -2,9 +2,9 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { UserInfoDto } from '../user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { appConfig } from 'src/configuration/app.config';
+import { appConfig } from '../../../src/configuration/app.config';
 import { Response } from 'express';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../../../src/prisma.service';
 
 @Injectable()
 export class EmailService {

@@ -26,7 +26,7 @@ export class JobService {
       interviewStages,
     } = createJobDto;
 
-    const vacancyNumber = parseInt(vacancy);
+    const vacancyNumber = vacancy;
     if (vacancyNumber < 1) {
       throw new BadRequestException('Vacancy can not be 0 or negetive');
     }

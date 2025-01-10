@@ -171,7 +171,7 @@ export class AuthService {
   }
 
   async socialLogin(dto: SocialLoginDto) {
-    console.warn(dto);
+    // console.warn(dto);
     if (dto.provider !== 'google') {
       throw new BadRequestException('Unsupported provider');
     }

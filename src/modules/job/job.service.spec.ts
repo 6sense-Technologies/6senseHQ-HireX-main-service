@@ -5,12 +5,12 @@ import { PrismaService } from '../../prisma.service';
 
 describe('JobService', () => {
   let service: JobService;
-  // let prisma: PrismaService;
 
   const mockPrismaService = {
     job: {
       create: jest.fn(),
       findMany: jest.fn(),
+      count: jest.fn(),
     },
     jobPosition: {
       findFirst: jest.fn(),
@@ -19,11 +19,11 @@ describe('JobService', () => {
       findFirst: jest.fn(),
     },
     jobInterviewStage: {
-      create: jest.fn(),
+      createMany: jest.fn(),
       findMany: jest.fn(),
     },
     interviewStage: {
-      findFirst: jest.fn(),
+      findMany: jest.fn(),
     },
   };
 
@@ -36,7 +36,6 @@ describe('JobService', () => {
     }).compile();
 
     service = module.get<JobService>(JobService);
-    // prisma = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(() => {
@@ -68,31 +67,39 @@ describe('JobService', () => {
         jobDepartmentName: 'Engineering',
       };
 
-      mockPrismaService.interviewStage.findFirst.mockResolvedValue(null);
+      mockPrismaService.interviewStage.findMany.mockResolvedValue([]);
 
       await expect(
         service.createJob(userInfoDTO, createJobDto as any),
       ).rejects.toThrow(BadRequestException);
-      expect(mockPrismaService.interviewStage.findFirst).toHaveBeenCalledWith({
-        where: { interviewStageName: 'Invalid Stage' },
+      expect(mockPrismaService.interviewStage.findMany).toHaveBeenCalledWith({
+        where: {
+          interviewStageName: {
+            in: ['Invalid Stage'],
+          },
+        },
       });
     });
+
     it('should create a job successfully', async () => {
-      const userInfoDTO = { userId: '1', email: 'user@example.com' }; // Include string userId and email
+      const userInfoDTO = { userId: '1', email: 'user@example.com' };
       const createJobDto = {
         jobResponsibility: 'Develop software',
         jobKeywords: 'Software, Developer',
-        vacancy: '2',
+        vacancy: 2,
         jobPositionName: 'Developer',
         jobDepartmentName: 'Engineering',
-        interviewStages: [{ interviewStageName: 'HR Interview' }],
+        interviewStages: [
+          { interviewStageName: 'HR Interview', interviewMedium: 'Online' },
+        ],
       };
 
-      // Mock Prisma calls
-      mockPrismaService.interviewStage.findFirst.mockResolvedValue({
-        interviewStageId: 1,
-        interviewStageName: 'HR Interview',
-      });
+      mockPrismaService.interviewStage.findMany.mockResolvedValue([
+        {
+          interviewStageId: 1,
+          interviewStageName: 'HR Interview',
+        },
+      ]);
       mockPrismaService.jobPosition.findFirst.mockResolvedValue({
         jobPositionId: 1,
         jobPositionName: 'Developer',
@@ -110,24 +117,15 @@ describe('JobService', () => {
         jobPositionId: 1,
         jobDepartmentId: 1,
       });
-      mockPrismaService.jobInterviewStage.create.mockResolvedValue({
-        interviewStageId: 1,
-        interviewType: 'HR Interview',
-        interviewFormat: 'structured',
-        jobId: '101',
-        createdBy: '1',
-      });
 
-      // Call the service method
       const result = await service.createJob(userInfoDTO, createJobDto as any);
 
-      // Expectations
       expect(mockPrismaService.job.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           jobResponsibility: 'Develop software',
           jobKeywords: 'Software, Developer',
           vacancy: 2,
-          createdBy: '1', // Ensure this is a string
+          createdBy: '1',
           jobPositionId: 1,
           jobDepartmentId: 1,
         }),
@@ -139,6 +137,7 @@ describe('JobService', () => {
           stages: [
             expect.objectContaining({
               interviewType: 'HR Interview',
+              interviewMedium: 'Online',
             }),
           ],
         }),
@@ -148,48 +147,69 @@ describe('JobService', () => {
 
   describe('listJobs', () => {
     it('should list all jobs with details', async () => {
+      const userInfoDTO = { userId: '1', email: 'a@gmail.com' };
       mockPrismaService.job.findMany.mockResolvedValue([
         {
           jobId: 1,
-          jobResponsibility: 'Develop software',
-          jobKeywords: 'Software',
+          jobPosition: { jobPositionName: 'Developer' },
+          jobDepartment: { jobDepartmentName: 'Engineering' },
           vacancy: 2,
-          createdBy: 1,
-          jobPositionId: 1,
-          jobDepartmentId: 1,
+          createdAt: new Date('2023-01-01T00:00:00Z'),
+          createdByUser: { name: 'John Doe', email: 'john@example.com' },
         },
       ]);
-      mockPrismaService.jobDepartment.findFirst.mockResolvedValue({
-        jobDepartmentId: 1,
-        jobDepartmentName: 'Engineering',
-      });
-      mockPrismaService.jobPosition.findFirst.mockResolvedValue({
-        jobPositionId: 1,
-        jobPositionName: 'Developer',
-      });
-      mockPrismaService.jobInterviewStage.findMany.mockResolvedValue([
-        {
-          interviewStageId: 1,
-          interviewType: 'HR Interview',
-          interviewFormat: 'structured',
+      mockPrismaService.job.count.mockResolvedValue(1);
+
+      const result = await service.listJobs(userInfoDTO, '1', '10');
+
+      expect(mockPrismaService.job.findMany).toHaveBeenCalledWith({
+        where: {
+          createdBy: userInfoDTO.userId,
         },
-      ]);
+        select: {
+          jobId: true,
+          jobPosition: {
+            select: {
+              jobPositionName: true,
+            },
+          },
+          jobDepartment: {
+            select: {
+              jobDepartmentName: true,
+            },
+          },
+          vacancy: true,
+          createdAt: true,
+          createdByUser: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip: 0,
+        take: 10,
+      });
 
-      const result = await service.listJobs();
-
-      expect(mockPrismaService.job.findMany).toHaveBeenCalled();
-      expect(result).toEqual([
-        expect.objectContaining({
-          jobResponsibility: 'Develop software',
-          jobPositionName: 'Developer',
-          jobDepartmentName: 'Engineering',
-          interviewStages: [
-            expect.objectContaining({
-              interviewType: 'HR Interview',
-            }),
-          ],
-        }),
-      ]);
+      expect(result).toEqual({
+        jobs: [
+          {
+            jobId: 1,
+            jobPosition: 'Developer',
+            numberOfVacancies: 2,
+            createdBy: 'John Doe',
+            createdAt: '01/01/2023',
+          },
+        ],
+        meta: {
+          totalCount: 1,
+          currentPage: 1,
+          totalPages: 1,
+        },
+      });
     });
   });
 });

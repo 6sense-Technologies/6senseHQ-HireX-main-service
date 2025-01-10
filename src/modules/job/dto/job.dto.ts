@@ -6,7 +6,7 @@ import {
   IsIn,
   ValidateNested,
   ArrayNotEmpty,
-  IsNumberString,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -59,8 +59,8 @@ export class CreateJobDtoUsingName {
     example: 5,
   })
   @IsNotEmpty()
-  @IsNumberString()
-  vacancy: string;
+  @IsNumber()
+  vacancy: number;
 
   @ApiProperty({
     description: 'Optional name of the job position',
