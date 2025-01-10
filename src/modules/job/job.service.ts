@@ -215,6 +215,8 @@ export class JobService {
       },
       select: {
         vacancy: true,
+        jobKeywords: true,
+        jobResponsibility: true,
         jobDepartment: {
           select: {
             jobDepartmentName: true,

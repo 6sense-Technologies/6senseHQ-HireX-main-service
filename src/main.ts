@@ -75,6 +75,6 @@ async function bootstrap() {
   appLogger.log('App running on port: ' + port);
   app.use(helmet()); //helmet
 
-  await app.listen(port, configService.get('PRODUCTION_IP'));
+  await app.listen(port, configService.get('LAN_IP'));
 }
 bootstrap();
