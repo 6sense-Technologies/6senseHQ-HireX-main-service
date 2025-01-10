@@ -1,6 +1,7 @@
 {
   "extends": ["config:base"],
   "rangeStrategy": "replace",
+  "baseBranches": ["test"],
   "packageRules": [
     {
       "matchDepTypes": ["dependencies", "devDependencies"],
