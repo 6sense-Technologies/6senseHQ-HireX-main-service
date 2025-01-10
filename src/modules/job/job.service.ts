@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma.service'; // Assuming PrismaService is in your `prisma` directory
 import { CreateJobDtoUsingName } from './dto/job.dto';
 import { Job } from '@prisma/client';
@@ -152,25 +156,45 @@ export class JobService {
       skip: offset,
       take: limitNumber,
     });
-
     const totalCount = await this.prisma.job.count({
       where: {
         createdBy: userInfoDto.userId,
       },
     });
+    // const [jobs, totalCount] = await this.prisma.$transaction([
+    //   this.prisma.job.findMany({
+    //     where: { createdBy: userInfoDto.userId },
+    //     select: {
+    //       jobId: true,
+    //       jobPosition: { select: { jobPositionName: true } },
+    //       jobDepartment: { select: { jobDepartmentName: true } },
+    //       vacancy: true,
+    //       createdAt: true,
+    //       createdByUser: { select: { name: true } },
+    //     },
+    //     orderBy: { createdAt: 'desc' },
+    //     skip: offset,
+    //     take: limitNumber,
+    //   }),
+    //   this.prisma.job.count({
+    //     where: { createdBy: userInfoDto.userId },
+    //   }),
+    // ]);
 
     return {
       jobs: jobs.map((job) => {
         return {
+          jobId: job.jobId,
           jobPosition: job.jobPosition.jobPositionName,
           numberOfVacancies: job.vacancy,
           createdBy: job.createdByUser.name,
-          createdAt: job.createdAt.toLocaleString('en-GB'),
+          createdAt: job.createdAt.toLocaleDateString('en-GB'),
         };
       }),
+
       meta: {
         totalCount,
-        currentPage: page,
+        currentPage: pageNumber,
         totalPages: Math.ceil(totalCount / limitNumber),
       },
     };
@@ -178,7 +202,7 @@ export class JobService {
 
   async viewJob(userInfoDto: UserInfoDto, jobId: string) {
     if (!isMongoId(jobId)) {
-      throw new BadRequestException('Invalid Request');
+      throw new NotFoundException('Job not found');
     }
     const job = await this.prisma.job.findFirst({
       where: {
@@ -187,11 +211,23 @@ export class JobService {
           createdBy: userInfoDto.userId,
         },
       },
-      include: {
-        jobDepartment: true,
-        jobPosition: true,
+      select: {
+        vacancy: true,
+        jobDepartment: {
+          select: {
+            jobDepartmentName: true,
+          },
+        },
+        jobPosition: {
+          select: {
+            jobPositionName: true,
+          },
+        },
       },
     });
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
     return job;
   }
 }

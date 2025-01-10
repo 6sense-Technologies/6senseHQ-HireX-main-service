@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Query,
+  Param,
+} from '@nestjs/common';
 import { JobService } from './job.service';
 import { CreateJobDtoUsingName } from './dto/job.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
@@ -27,10 +35,10 @@ export class JobController {
     return this.jobService.listJobs(userInfoDto, page);
   }
 
-  @Get('detail')
+  @Get('detail/:id')
   async detail(
     @UserInfo() userInfoDto: UserInfoDto,
-    @Query('id') jobId: string,
+    @Param('id') jobId: string,
   ) {
     return this.jobService.viewJob(userInfoDto, jobId);
   }
