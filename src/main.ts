@@ -24,6 +24,7 @@ async function bootstrap() {
   const appLogger = new Logger('HireX logger', { timestamp: true });
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
       stopAtFirstError: true,
     }),
   );

@@ -64,7 +64,7 @@ export class CreateJobDtoUsingName {
 
   @ApiProperty({
     description: 'Optional name of the job position',
-    example: 'Software Engineer',
+    example: 'UI Designer II',
     required: false,
   })
   @IsNotEmpty()
@@ -73,7 +73,7 @@ export class CreateJobDtoUsingName {
 
   @ApiProperty({
     description: 'Optional name of the job department',
-    example: 'Engineering',
+    example: 'Design',
     required: false,
   })
   @IsOptional()
