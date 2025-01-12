@@ -38,7 +38,7 @@ describe('JobPositionService', () => {
 
   describe('listJobPosition', () => {
     it('should return a list of job positions', async () => {
-      const result = await service.listJobPosition();
+      const result = await service.listJobPosition('dummy');
 
       expect(prismaService.jobPosition.findMany).toHaveBeenCalled();
       expect(result).toEqual(mockJobPositions);
@@ -49,7 +49,9 @@ describe('JobPositionService', () => {
         .spyOn(prismaService.jobPosition, 'findMany')
         .mockRejectedValueOnce(new Error('Database error'));
 
-      await expect(service.listJobPosition()).rejects.toThrow('Database error');
+      await expect(service.listJobPosition('dummy')).rejects.toThrow(
+        'Database error',
+      );
     });
   });
 });

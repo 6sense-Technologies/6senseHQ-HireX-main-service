@@ -116,7 +116,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    console.log(user.is_verified);
+    // console.log(user.is_verified);
     if (user) {
       if (user.is_verified) {
         await this.login(dto);
@@ -175,8 +175,8 @@ export class AuthService {
     if (dto.provider !== 'google') {
       throw new BadRequestException('Unsupported provider');
     }
-    console.log('CLIENTID: ' + appConfig.GOOGLE_CLIENT_ID);
-    console.log('CLIENT SECRET: ' + appConfig.GOOGLE_CLIENT_SECRET);
+    // console.log('CLIENTID: ' + appConfig.GOOGLE_CLIENT_ID);
+    // console.log('CLIENT SECRET: ' + appConfig.GOOGLE_CLIENT_SECRET);
     const client = new OAuth2Client(
       appConfig.GOOGLE_CLIENT_ID,
       appConfig.GOOGLE_CLIENT_SECRET,
@@ -207,7 +207,7 @@ export class AuthService {
     }
 
     const { email, name, sub } = payload;
-    console.log(payload);
+    // console.log(payload);
     let user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
       user = await this.prisma.user.create({

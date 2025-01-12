@@ -14,12 +14,12 @@ export class EmailService {
     private readonly prismaService: PrismaService,
   ) {}
   public async sendVerficationEmail(userInfoDTO: UserInfoDto) {
-    console.log(appConfig.EMAIL_VERIFICATION_SECRET);
+    // console.log(appConfig.EMAIL_VERIFICATION_SECRET);
     const verificationToken = this.jwtService.sign(userInfoDTO, {
       secret: appConfig.EMAIL_VERIFICATION_SECRET,
     });
     const emailTemplate = `Dear User,Click the link to verify: ${appConfig.EMAIL_VERIFY_URL}:${appConfig.APP_PORT}/email-service/verify/${verificationToken}`;
-    console.log(emailTemplate);
+    // console.log(emailTemplate);
     const result = await this.mailerService.sendMail({
       from: `6sense Projects ${appConfig.EMAIL_SENDER}`,
       to: userInfoDTO.email,
@@ -61,7 +61,8 @@ export class EmailService {
         res.redirect(appConfig.EMAIL_VERIFICATION_FAILED_REDIRECT);
       }
     } catch (error) {
-      console.error('Verification failed:', error.message);
+      // console.error('Verification failed:', error.message);
+      console.log(error.message);
       res.redirect(appConfig.EMAIL_VERIFICATION_FAILED_REDIRECT);
     }
   }
