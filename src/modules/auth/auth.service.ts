@@ -8,15 +8,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma.service';
 import * as bcrypt from 'bcrypt';
-import {
-  SignupDto,
-  LoginDto,
-  SocialLoginDto,
-  EmailAndRefreshTokenDto,
-} from './dto/auth.dto';
+import { SignupDto, LoginDto, SocialLoginDto } from './dto/auth.dto';
 import { OAuth2Client } from 'google-auth-library';
 import { appConfig } from '../../configuration/app.config';
 import { EmailService } from '../email-service/email.service';
+import { isJWT } from 'class-validator';
 @Injectable()
 export class AuthService {
   constructor(
@@ -112,19 +108,28 @@ export class AuthService {
   async loginV2(dto: LoginDto) {
     /// TODO: merge loginV2 with login.
     /// Note: This is temporary.
-
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-    // console.log(user.is_verified);
-    if (user) {
-      if (user.is_verified) {
-        await this.login(dto);
+    // const user = await this.prisma.user.findUnique({
+    //   where: { email: dto.email },
+    // });
+    // // console.log(user.is_verified);
+    // if (user) {
+    //   if (user.is_verified) {
+    //     return await this.login(dto);
+    //   } else {
+    //     throw new UnauthorizedException('User is not verified');
+    //   }
+    // } else {
+    //   throw new UnauthorizedException('Invalid credentials');
+    // }
+    const response = await this.login(dto);
+    if (response.userInfo) {
+      if (response.userInfo.is_verified) {
+        return response;
       } else {
-        throw new NotFoundException('User is not verified');
+        throw new UnauthorizedException('User is not verified');
       }
     } else {
-      throw new NotFoundException('Invalid credentials');
+      throw new UnauthorizedException('User is not verified');
     }
   }
   private generateTokens(userId: string, email: string) {
@@ -153,16 +158,20 @@ export class AuthService {
     });
   }
 
-  async refreshTokens(dto: EmailAndRefreshTokenDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+  async refreshTokens(refreshToken: string) {
+    if (!isJWT(refreshToken)) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const verifyToken = await this.jwtService.verify(refreshToken, {
+      secret: appConfig.JWT_REFRESH_SECRET,
     });
-    if (
-      !user ||
-      !(await this.jwtService.verify(dto.refreshToken, {
-        secret: appConfig.JWT_REFRESH_SECRET,
-      }))
-    ) {
+    if (!verifyToken) {
+      throw new UnauthorizedException('Invalid Refresh token');
+    }
+    const user = await this.prisma.user.findUnique({
+      where: { email: verifyToken.email },
+    });
+    if (!user) {
       throw new UnauthorizedException('Invalid refresh token');
     }
     const tokens = this.generateTokens(user.id, user.email);

@@ -1,12 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  SignupDto,
-  LoginDto,
-  SocialLoginDto,
-  EmailAndRefreshTokenDto,
-  EmailDTO,
-} from './dto/auth.dto';
+import { SignupDto, LoginDto, SocialLoginDto } from './dto/auth.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 // import { RefreshTokenGuard } from './guards/refreshToken.guard';
@@ -32,14 +26,9 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiBearerAuth()
   @Post('refresh')
-  refreshTokens(@Body() dto: EmailDTO, @Req() req: Request) {
+  refreshTokens(@Req() req: Request) {
     const refreshToken: string = req['user'].refreshToken;
-
-    const refreshTokendto: EmailAndRefreshTokenDto = {
-      email: dto.email,
-      refreshToken: refreshToken,
-    };
-    return this.authService.refreshTokens(refreshTokendto);
+    return this.authService.refreshTokens(refreshToken);
   }
   @Post('social-login')
   socialLogin(@Body() dto: SocialLoginDto) {
