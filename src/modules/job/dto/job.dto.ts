@@ -28,10 +28,18 @@ export class InterviewStageDto {
   })
   @IsString()
   @IsNotEmpty()
-  @IsIn(['Online-Video', 'Online-Voice', 'Online-Quiz', 'Offline'], {
-    message:
-      'interviewMedium must be either Online-Video, Online-Voice, Online-Quiz or Offline.',
-  })
+  @IsIn(
+    [
+      'Onsite Interview',
+      'Online Test',
+      'Online Interview',
+      'Phone/Audio Interview',
+    ],
+    {
+      message:
+        'interviewMedium must be either Onsite Interview,Online Test,Online Interview,Phone/Audio Interview',
+    },
+  )
   interviewMedium: string;
 }
 
