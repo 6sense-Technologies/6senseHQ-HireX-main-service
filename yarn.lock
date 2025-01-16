@@ -906,16 +906,16 @@
   dependencies:
     path-to-regexp "0.2.5"
 
-"@nestjs/swagger@^8.1.0":
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-8.1.0.tgz#e55434053df454b5058ead94e33d94dcf4525e8f"
-  integrity sha512-8hzH+r/31XshzXHC9vww4T0xjDAxMzvOaT1xAOvvY1LtXTWyNRCUP2iQsCYJOnnMrR+vydWjvRZiuB3hdvaHxA==
+"@nestjs/swagger@^11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-11.0.0.tgz#9ed16107afca22b585c0aacd021126e83016ce98"
+  integrity sha512-sk2Mmf/hr75VM+HcHS62a/rGR+GX8g37VLK6Lr2dXM6r3pKJO1g++wOf2d1OOBBz3edDedgpK4A6mMp9ZC/j7Q==
   dependencies:
     "@microsoft/tsdoc" "^0.15.0"
     "@nestjs/mapped-types" "2.0.6"
     js-yaml "4.1.0"
     lodash "4.17.21"
-    path-to-regexp "3.3.0"
+    path-to-regexp "^8.2.0"
     swagger-ui-dist "5.18.2"
 
 "@nestjs/terminus@^10.2.3":
@@ -6104,6 +6104,11 @@ path-to-regexp@3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-3.3.0.tgz#f7f31d32e8518c2660862b644414b6d5c63a611b"
   integrity sha512-qyCH421YQPS2WFDxDjftfc1ZR5WKQzVzqsp4n9M2kQhVOo/ByahFoUNJfl58kOcEGfQ//7weFTDhm+ss8Ecxgw==
+
+path-to-regexp@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-8.2.0.tgz#73990cc29e57a3ff2a0d914095156df5db79e8b4"
+  integrity sha512-TdrF7fW9Rphjq4RjrW0Kp2AW0Ahwu9sRGTkS6bvDi0SCwZlEZYmcfDbEsTz8RVk0EHIS/Vd1bv3JhG+1xZuAyQ==
 
 path-type@^4.0.0:
   version "4.0.0"
