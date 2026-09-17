@@ -32,7 +32,7 @@
     "@nestjs/swagger": "^8.1.0",
     "@nestjs/terminus": "^10.2.3",
     "@nestjs/throttler": "^6.3.0",
-    "@prisma/client": "^6.1.0",
+    "@prisma/client": "^7.0.0",
     "@sentry/nestjs": "^8.47.0",
     "@sentry/profiling-node": "^8.47.0",
     "axios": "^1.7.9",
